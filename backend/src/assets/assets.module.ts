@@ -7,10 +7,7 @@ import { AssetToken } from './entities/asset-token.entity';
 import { BlockchainModule } from '../blockchain/blockchain.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Asset, AssetToken]),
-    BlockchainModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Asset, AssetToken]), BlockchainModule],
   controllers: [AssetsController],
   providers: [AssetsService],
 })

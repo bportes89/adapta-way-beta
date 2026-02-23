@@ -19,10 +19,7 @@ let AssetsModule = class AssetsModule {
 exports.AssetsModule = AssetsModule;
 exports.AssetsModule = AssetsModule = __decorate([
     (0, common_1.Module)({
-        imports: [
-            typeorm_1.TypeOrmModule.forFeature([asset_entity_1.Asset, asset_token_entity_1.AssetToken]),
-            blockchain_module_1.BlockchainModule,
-        ],
+        imports: [typeorm_1.TypeOrmModule.forFeature([asset_entity_1.Asset, asset_token_entity_1.AssetToken]), blockchain_module_1.BlockchainModule],
         controllers: [assets_controller_1.AssetsController],
         providers: [assets_service_1.AssetsService],
     })

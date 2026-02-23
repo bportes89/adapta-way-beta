@@ -1,4 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  CreateDateColumn,
+} from 'typeorm';
 import { Wallet } from './wallet.entity';
 
 export enum TransactionType {
@@ -21,7 +27,7 @@ export class Transaction {
   @Column({
     type: 'simple-enum',
     enum: TransactionType,
-    default: TransactionType.TRANSFER
+    default: TransactionType.TRANSFER,
   })
   type: TransactionType;
 

@@ -74,7 +74,12 @@ let AuthService = class AuthService {
                 user: { email: user.email, id: user.id, role: user.role },
             };
         }
-        const payload = { email: user.email, sub: user.id, role: user.role, isTwoFactorAuthenticated: true };
+        const payload = {
+            email: user.email,
+            sub: user.id,
+            role: user.role,
+            isTwoFactorAuthenticated: true,
+        };
         return {
             access_token: this.jwtService.sign(payload),
             isTwoFactorAuthenticationEnabled: false,
@@ -92,7 +97,12 @@ let AuthService = class AuthService {
         if (!isCodeValid) {
             throw new common_1.UnauthorizedException('Wrong authentication code');
         }
-        const payload = { email: user.email, sub: user.id, role: user.role, isTwoFactorAuthenticated: true };
+        const payload = {
+            email: user.email,
+            sub: user.id,
+            role: user.role,
+            isTwoFactorAuthenticated: true,
+        };
         return {
             access_token: this.jwtService.sign(payload),
         };

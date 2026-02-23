@@ -56,7 +56,9 @@ let AssetsService = class AssetsService {
         await queryRunner.connect();
         await queryRunner.startTransaction();
         try {
-            const asset = await this.assetRepository.findOne({ where: { id: assetId } });
+            const asset = await this.assetRepository.findOne({
+                where: { id: assetId },
+            });
             if (!asset)
                 throw new common_1.NotFoundException('Asset not found');
             if (asset.availableSupply < amount) {

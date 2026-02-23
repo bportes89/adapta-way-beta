@@ -40,7 +40,7 @@ export class BlockchainService implements OnModuleInit {
     newBlock.data = JSON.stringify(data);
     newBlock.previousHash = lastBlock.hash;
     newBlock.nonce = 0;
-    
+
     // Proof of Work Simulation (Difficulty: 2 leading zeros)
     // In a real scenario, this would be much harder (e.g. 4+ zeros)
     this.mineBlock(newBlock, 2);

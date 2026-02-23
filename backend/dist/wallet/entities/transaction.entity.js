@@ -43,7 +43,7 @@ __decorate([
     (0, typeorm_1.Column)({
         type: 'simple-enum',
         enum: TransactionType,
-        default: TransactionType.TRANSFER
+        default: TransactionType.TRANSFER,
     }),
     __metadata("design:type", String)
 ], Transaction.prototype, "type", void 0);

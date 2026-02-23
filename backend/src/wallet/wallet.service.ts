@@ -1,9 +1,16 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { Wallet } from './entities/wallet.entity';
 import { Transaction, TransactionType } from './entities/transaction.entity';
-import { WithdrawalRequest, WithdrawalStatus } from './entities/withdrawal-request.entity';
+import {
+  WithdrawalRequest,
+  WithdrawalStatus,
+} from './entities/withdrawal-request.entity';
 import { User } from '../users/entities/user.entity';
 import { BlockchainService } from '../blockchain/blockchain.service';
 import * as crypto from 'crypto';
@@ -38,9 +45,9 @@ export class WalletService {
       await this.walletRepository.save(user.wallet);
     }
 
-    return { 
+    return {
       balance: user.wallet.balance,
-      address: user.wallet.address 
+      address: user.wallet.address,
     };
   }
 
@@ -108,25 +115,28 @@ export class WalletService {
       // If not found by email, try to find by Wallet Address
       if (!toUser) {
         const wallet = await this.walletRepository.findOne({
-            where: { address: recipient },
-            relations: ['user']
+          where: { address: recipient },
+          relations: ['user'],
         });
         if (wallet && wallet.user) {
-            toUser = await this.userRepository.findOne({
-                where: { id: wallet.user.id },
-                relations: ['wallet']
-            });
+          toUser = await this.userRepository.findOne({
+            where: { id: wallet.user.id },
+            relations: ['wallet'],
+          });
         }
       }
 
-      if (!fromUser || !fromUser.wallet) throw new NotFoundException('Sender wallet not found');
-      if (!toUser || !toUser.wallet) throw new NotFoundException('Recipient not found');
+      if (!fromUser || !fromUser.wallet)
+        throw new NotFoundException('Sender wallet not found');
+      if (!toUser || !toUser.wallet)
+        throw new NotFoundException('Recipient not found');
 
       if (fromUser.wallet.balance < amount) {
         throw new BadRequestException('Insufficient balance');
       }
 
-      fromUser.wallet.balance = Number(fromUser.wallet.balance) - Number(amount);
+      fromUser.wallet.balance =
+        Number(fromUser.wallet.balance) - Number(amount);
       toUser.wallet.balance = Number(toUser.wallet.balance) + Number(amount);
 
       await queryRunner.manager.save(fromUser.wallet);
@@ -184,10 +194,13 @@ export class WalletService {
       const totalDeduction = Number(amount) + Number(tax);
 
       if (user.wallet.balance < totalDeduction) {
-        throw new BadRequestException('Insufficient balance to cover withdrawal + tax');
+        throw new BadRequestException(
+          'Insufficient balance to cover withdrawal + tax',
+        );
       }
 
-      user.wallet.balance = Number(user.wallet.balance) - Number(totalDeduction);
+      user.wallet.balance =
+        Number(user.wallet.balance) - Number(totalDeduction);
       await queryRunner.manager.save(user.wallet);
 
       const transaction = new Transaction();
@@ -236,7 +249,9 @@ export class WalletService {
       const totalDeduction = Number(amount) + tax;
 
       if (Number(user.wallet.balance) < totalDeduction) {
-        throw new BadRequestException('Insufficient balance to cover withdrawal + tax');
+        throw new BadRequestException(
+          'Insufficient balance to cover withdrawal + tax',
+        );
       }
 
       // Deduct immediately to lock funds
@@ -351,8 +366,9 @@ export class WalletService {
       // Refund the user
       const tax = Number(request.amount) * 0.01;
       const totalRefund = Number(request.amount) + tax;
-      
-      request.user.wallet.balance = Number(request.user.wallet.balance) + totalRefund;
+
+      request.user.wallet.balance =
+        Number(request.user.wallet.balance) + totalRefund;
       await queryRunner.manager.save(request.user.wallet);
 
       request.status = WithdrawalStatus.REJECTED;
@@ -381,21 +397,21 @@ export class WalletService {
 
   async getHistory(userId: string) {
     const user = await this.userRepository.findOne({
-        where: { id: userId },
-        relations: ['wallet'],
+      where: { id: userId },
+      relations: ['wallet'],
     });
 
     if (!user || !user.wallet) {
-        throw new NotFoundException('Wallet not found');
+      throw new NotFoundException('Wallet not found');
     }
 
     const transactions = await this.transactionRepository.find({
-        where: [
-            { fromWallet: { id: user.wallet.id } },
-            { toWallet: { id: user.wallet.id } }
-        ],
-        order: { timestamp: 'DESC' },
-        relations: ['fromWallet', 'toWallet']
+      where: [
+        { fromWallet: { id: user.wallet.id } },
+        { toWallet: { id: user.wallet.id } },
+      ],
+      order: { timestamp: 'DESC' },
+      relations: ['fromWallet', 'toWallet'],
     });
 
     return transactions;

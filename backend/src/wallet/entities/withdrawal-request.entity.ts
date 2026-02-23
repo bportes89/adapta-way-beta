@@ -1,4 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  CreateDateColumn,
+} from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 
 export enum WithdrawalStatus {
@@ -21,7 +27,7 @@ export class WithdrawalRequest {
   @Column({
     type: 'simple-enum',
     enum: WithdrawalStatus,
-    default: WithdrawalStatus.PENDING
+    default: WithdrawalStatus.PENDING,
   })
   status: WithdrawalStatus;
 

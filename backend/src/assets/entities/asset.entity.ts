@@ -22,7 +22,7 @@ export class Asset {
   @Column({
     type: 'simple-enum',
     enum: AssetType,
-    default: AssetType.PROJECT
+    default: AssetType.PROJECT,
   })
   type: AssetType;
 

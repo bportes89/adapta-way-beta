@@ -19,7 +19,7 @@ export class NftsService {
 
   async create(createNftDto: CreateNftDto, userId: string) {
     const ownerId = createNftDto.ownerId || userId;
-    
+
     // Find wallet by user ID (assuming relation user -> wallet)
     // Actually wallet.user is the relation.
     const wallet = await this.walletRepository.findOne({
@@ -61,9 +61,9 @@ export class NftsService {
   }
 
   findOne(id: string) {
-    return this.nftRepository.findOne({ 
+    return this.nftRepository.findOne({
       where: { id },
-      relations: ['owner', 'owner.user']
+      relations: ['owner', 'owner.user'],
     });
   }
 

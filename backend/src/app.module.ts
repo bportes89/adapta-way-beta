@@ -22,7 +22,7 @@ import { NftsModule } from './nfts/nfts.module';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         const dbType = configService.get<string>('DB_TYPE') || 'sqlite';
-        
+
         if (dbType === 'mysql' || dbType === 'mariadb') {
           return {
             type: dbType as any,

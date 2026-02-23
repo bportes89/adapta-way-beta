@@ -44,7 +44,7 @@ __decorate([
     (0, typeorm_1.Column)({
         type: 'simple-enum',
         enum: WithdrawalStatus,
-        default: WithdrawalStatus.PENDING
+        default: WithdrawalStatus.PENDING,
     }),
     __metadata("design:type", String)
 ], WithdrawalRequest.prototype, "status", void 0);

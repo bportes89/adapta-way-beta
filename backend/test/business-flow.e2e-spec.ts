@@ -35,14 +35,16 @@ describe('Business Flow (e2e)', () => {
       .expect(201);
 
     // Update Role directly
-    await dataSource.query(`UPDATE user SET role = 'admin' WHERE email = '${email}'`);
+    await dataSource.query(
+      `UPDATE user SET role = 'admin' WHERE email = '${email}'`,
+    );
 
     // Login
     const res = await request(app.getHttpServer())
       .post('/auth/login')
       .send({ email, password: 'password' })
       .expect(201);
-    
+
     adminToken = res.body.access_token;
     expect(adminToken).toBeDefined();
   });
@@ -58,7 +60,7 @@ describe('Business Flow (e2e)', () => {
       .post('/auth/login')
       .send({ email, password: 'password' })
       .expect(201);
-    
+
     userToken = res.body.access_token;
     expect(userToken).toBeDefined();
   });
@@ -69,7 +71,7 @@ describe('Business Flow (e2e)', () => {
       .set('Authorization', `Bearer ${userToken}`)
       .send({ amount: 1000 })
       .expect(201);
-    
+
     expect(Number(res.body.newBalance)).toBe(1000);
   });
 
@@ -84,7 +86,7 @@ describe('Business Flow (e2e)', () => {
         referenceValue: 10,
       })
       .expect(201);
-    
+
     assetId = res.body.id;
     expect(assetId).toBeDefined();
   });
@@ -101,7 +103,7 @@ describe('Business Flow (e2e)', () => {
       .get('/wallet/balance')
       .set('Authorization', `Bearer ${userToken}`)
       .expect(200);
-    
+
     expect(Number(balRes.body.balance)).toBe(900);
 
     // Check Assets
@@ -109,7 +111,7 @@ describe('Business Flow (e2e)', () => {
       .get('/assets/my')
       .set('Authorization', `Bearer ${userToken}`)
       .expect(200);
-    
+
     const myAsset = assetsRes.body.find((a: any) => a.asset.id === assetId);
     expect(myAsset).toBeDefined();
     expect(myAsset.amount).toBe(10);
@@ -125,7 +127,7 @@ describe('Business Flow (e2e)', () => {
         metadata: { power: 9000 },
       })
       .expect(201);
-    
+
     expect(res.body.blockchainHash).toBeDefined();
 
     // Verify ownership
@@ -133,7 +135,7 @@ describe('Business Flow (e2e)', () => {
       .get('/nfts/my')
       .set('Authorization', `Bearer ${userToken}`)
       .expect(200);
-    
+
     expect(myNfts.body.length).toBeGreaterThan(0);
     expect(myNfts.body[0].name).toBe('My Sword');
   });
@@ -143,7 +145,7 @@ describe('Business Flow (e2e)', () => {
       .get('/blockchain/valid')
       .set('Authorization', `Bearer ${userToken}`) // Any user can check
       .expect(200);
-    
+
     expect(res.text).toBe('true');
   });
 });

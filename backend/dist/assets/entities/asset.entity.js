@@ -46,7 +46,7 @@ __decorate([
     (0, typeorm_1.Column)({
         type: 'simple-enum',
         enum: AssetType,
-        default: AssetType.PROJECT
+        default: AssetType.PROJECT,
     }),
     __metadata("design:type", String)
 ], Asset.prototype, "type", void 0);

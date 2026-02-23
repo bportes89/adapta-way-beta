@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Request } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { AssetsService } from './assets.service';
 import { CreateAssetDto } from './dto/create-asset.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -34,7 +42,11 @@ export class AssetsController {
 
   @UseGuards(JwtAuthGuard)
   @Post(':id/buy')
-  buyAsset(@Param('id') id: string, @Body() body: { amount: number }, @Request() req: any) {
+  buyAsset(
+    @Param('id') id: string,
+    @Body() body: { amount: number },
+    @Request() req: any,
+  ) {
     return this.assetsService.buyAsset(req.user.userId, id, body.amount);
   }
 }

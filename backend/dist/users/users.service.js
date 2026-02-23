@@ -61,7 +61,9 @@ let UsersService = class UsersService {
         this.walletRepository = walletRepository;
     }
     async create(createUserDto) {
-        const existingUser = await this.usersRepository.findOne({ where: { email: createUserDto.email } });
+        const existingUser = await this.usersRepository.findOne({
+            where: { email: createUserDto.email },
+        });
         if (existingUser) {
             throw new common_1.ConflictException('Email already exists');
         }
@@ -82,10 +84,16 @@ let UsersService = class UsersService {
         return this.usersRepository.find();
     }
     findOne(id) {
-        return this.usersRepository.findOne({ where: { id }, relations: ['wallet'] });
+        return this.usersRepository.findOne({
+            where: { id },
+            relations: ['wallet'],
+        });
     }
     async findByEmail(email) {
-        return this.usersRepository.findOne({ where: { email }, relations: ['wallet'] });
+        return this.usersRepository.findOne({
+            where: { email },
+            relations: ['wallet'],
+        });
     }
     async update(id, updateUserDto) {
         return this.usersRepository.update(id, updateUserDto);

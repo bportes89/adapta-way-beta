@@ -32,7 +32,12 @@ export class AuthService {
         user: { email: user.email, id: user.id, role: user.role },
       };
     }
-    const payload = { email: user.email, sub: user.id, role: user.role, isTwoFactorAuthenticated: true };
+    const payload = {
+      email: user.email,
+      sub: user.id,
+      role: user.role,
+      isTwoFactorAuthenticated: true,
+    };
     return {
       access_token: this.jwtService.sign(payload),
       isTwoFactorAuthenticationEnabled: false,
@@ -53,7 +58,12 @@ export class AuthService {
       throw new UnauthorizedException('Wrong authentication code');
     }
 
-    const payload = { email: user.email, sub: user.id, role: user.role, isTwoFactorAuthenticated: true };
+    const payload = {
+      email: user.email,
+      sub: user.id,
+      role: user.role,
+      isTwoFactorAuthenticated: true,
+    };
     return {
       access_token: this.jwtService.sign(payload),
     };
@@ -63,7 +73,10 @@ export class AuthService {
     const secret = authenticator.generateSecret();
     const otpauthUrl = authenticator.keyuri(user.email, 'AdaptaWay', secret);
 
-    await this.usersService.setTwoFactorAuthenticationSecret(secret, user.userId);
+    await this.usersService.setTwoFactorAuthenticationSecret(
+      secret,
+      user.userId,
+    );
 
     return {
       secret,

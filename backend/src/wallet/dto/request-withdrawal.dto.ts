@@ -8,7 +8,10 @@ export class RequestWithdrawalDto {
   @Min(1)
   amount: number;
 
-  @ApiProperty({ example: 'user@example.com', description: 'PIX key for withdrawal' })
+  @ApiProperty({
+    example: 'user@example.com',
+    description: 'PIX key for withdrawal',
+  })
   @IsString()
   @IsNotEmpty()
   pixKey: string;

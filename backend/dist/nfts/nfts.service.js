@@ -63,7 +63,7 @@ let NftsService = class NftsService {
     findOne(id) {
         return this.nftRepository.findOne({
             where: { id },
-            relations: ['owner', 'owner.user']
+            relations: ['owner', 'owner.user'],
         });
     }
     update(id, updateNftDto) {

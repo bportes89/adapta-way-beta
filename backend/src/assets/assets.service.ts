@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { Asset } from './entities/asset.entity';
@@ -6,7 +10,10 @@ import { AssetToken } from './entities/asset-token.entity';
 import { CreateAssetDto } from './dto/create-asset.dto';
 import { WalletService } from '../wallet/wallet.service';
 import { Wallet } from '../wallet/entities/wallet.entity';
-import { Transaction, TransactionType } from '../wallet/entities/transaction.entity';
+import {
+  Transaction,
+  TransactionType,
+} from '../wallet/entities/transaction.entity';
 import { BlockchainService } from '../blockchain/blockchain.service';
 
 @Injectable()
@@ -49,7 +56,9 @@ export class AssetsService {
     await queryRunner.startTransaction();
 
     try {
-      const asset = await this.assetRepository.findOne({ where: { id: assetId } });
+      const asset = await this.assetRepository.findOne({
+        where: { id: assetId },
+      });
       if (!asset) throw new NotFoundException('Asset not found');
 
       if (asset.availableSupply < amount) {

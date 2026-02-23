@@ -1,9 +1,23 @@
-import { Controller, Get, Post, Body, UseGuards, Request, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  UseGuards,
+  Request,
+  Param,
+} from '@nestjs/common';
 import { WalletService } from './wallet.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiBody,
+} from '@nestjs/swagger';
 import { RequestWithdrawalDto } from './dto/request-withdrawal.dto';
 
 @ApiTags('wallet')
@@ -21,30 +35,64 @@ export class WalletController {
 
   @Post('deposit')
   @ApiOperation({ summary: 'Deposit funds (mock)' })
-  @ApiBody({ schema: { type: 'object', properties: { amount: { type: 'number', example: 100 } } } })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: { amount: { type: 'number', example: 100 } },
+    },
+  })
   deposit(@Request() req: any, @Body() body: { amount: number }) {
     return this.walletService.deposit(req.user.userId, body.amount);
   }
 
   @Post('transfer')
-  @ApiOperation({ summary: 'Transfer funds to another user (Email or Wallet Address)' })
-  @ApiBody({ schema: { type: 'object', properties: { recipient: { type: 'string', example: 'receiver@example.com or 0x...' }, amount: { type: 'number', example: 50 } } } })
-  transfer(@Request() req: any, @Body() body: { recipient: string; amount: number }) {
-    return this.walletService.transfer(req.user.userId, body.recipient, body.amount);
+  @ApiOperation({
+    summary: 'Transfer funds to another user (Email or Wallet Address)',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        recipient: { type: 'string', example: 'receiver@example.com or 0x...' },
+        amount: { type: 'number', example: 50 },
+      },
+    },
+  })
+  transfer(
+    @Request() req: any,
+    @Body() body: { recipient: string; amount: number },
+  ) {
+    return this.walletService.transfer(
+      req.user.userId,
+      body.recipient,
+      body.amount,
+    );
   }
 
   @Post('withdraw')
   @ApiOperation({ summary: 'Immediate withdrawal (simulated)' })
-  @ApiBody({ schema: { type: 'object', properties: { amount: { type: 'number', example: 100 } } } })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: { amount: { type: 'number', example: 100 } },
+    },
+  })
   withdraw(@Request() req: any, @Body() body: { amount: number }) {
     return this.walletService.withdraw(req.user.userId, body.amount);
   }
 
   @Post('withdraw-request')
   @ApiOperation({ summary: 'Request a withdrawal via PIX' })
-  @ApiResponse({ status: 201, description: 'Withdrawal requested successfully.' })
+  @ApiResponse({
+    status: 201,
+    description: 'Withdrawal requested successfully.',
+  })
   requestWithdrawal(@Request() req: any, @Body() body: RequestWithdrawalDto) {
-    return this.walletService.requestWithdrawal(req.user.userId, body.amount, body.pixKey);
+    return this.walletService.requestWithdrawal(
+      req.user.userId,
+      body.amount,
+      body.pixKey,
+    );
   }
 
   @Get('withdrawals')

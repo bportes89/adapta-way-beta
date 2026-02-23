@@ -84,7 +84,7 @@ let WalletService = class WalletService {
         }
         return {
             balance: user.wallet.balance,
-            address: user.wallet.address
+            address: user.wallet.address,
         };
     }
     async deposit(userId, amount) {
@@ -140,12 +140,12 @@ let WalletService = class WalletService {
             if (!toUser) {
                 const wallet = await this.walletRepository.findOne({
                     where: { address: recipient },
-                    relations: ['user']
+                    relations: ['user'],
                 });
                 if (wallet && wallet.user) {
                     toUser = await this.userRepository.findOne({
                         where: { id: wallet.user.id },
-                        relations: ['wallet']
+                        relations: ['wallet'],
                     });
                 }
             }
@@ -156,7 +156,8 @@ let WalletService = class WalletService {
             if (fromUser.wallet.balance < amount) {
                 throw new common_1.BadRequestException('Insufficient balance');
             }
-            fromUser.wallet.balance = Number(fromUser.wallet.balance) - Number(amount);
+            fromUser.wallet.balance =
+                Number(fromUser.wallet.balance) - Number(amount);
             toUser.wallet.balance = Number(toUser.wallet.balance) + Number(amount);
             await queryRunner.manager.save(fromUser.wallet);
             await queryRunner.manager.save(toUser.wallet);
@@ -205,7 +206,8 @@ let WalletService = class WalletService {
             if (user.wallet.balance < totalDeduction) {
                 throw new common_1.BadRequestException('Insufficient balance to cover withdrawal + tax');
             }
-            user.wallet.balance = Number(user.wallet.balance) - Number(totalDeduction);
+            user.wallet.balance =
+                Number(user.wallet.balance) - Number(totalDeduction);
             await queryRunner.manager.save(user.wallet);
             const transaction = new transaction_entity_1.Transaction();
             transaction.amount = amount;
@@ -344,7 +346,8 @@ let WalletService = class WalletService {
             }
             const tax = Number(request.amount) * 0.01;
             const totalRefund = Number(request.amount) + tax;
-            request.user.wallet.balance = Number(request.user.wallet.balance) + totalRefund;
+            request.user.wallet.balance =
+                Number(request.user.wallet.balance) + totalRefund;
             await queryRunner.manager.save(request.user.wallet);
             request.status = withdrawal_request_entity_1.WithdrawalStatus.REJECTED;
             request.processedAt = new Date();
@@ -378,10 +381,10 @@ let WalletService = class WalletService {
         const transactions = await this.transactionRepository.find({
             where: [
                 { fromWallet: { id: user.wallet.id } },
-                { toWallet: { id: user.wallet.id } }
+                { toWallet: { id: user.wallet.id } },
             ],
             order: { timestamp: 'DESC' },
-            relations: ['fromWallet', 'toWallet']
+            relations: ['fromWallet', 'toWallet'],
         });
         return transactions;
     }

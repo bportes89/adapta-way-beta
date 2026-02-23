@@ -68,7 +68,12 @@ __decorate([
 __decorate([
     (0, common_1.Post)('deposit'),
     (0, swagger_1.ApiOperation)({ summary: 'Deposit funds (mock)' }),
-    (0, swagger_1.ApiBody)({ schema: { type: 'object', properties: { amount: { type: 'number', example: 100 } } } }),
+    (0, swagger_1.ApiBody)({
+        schema: {
+            type: 'object',
+            properties: { amount: { type: 'number', example: 100 } },
+        },
+    }),
     __param(0, (0, common_1.Request)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -77,8 +82,18 @@ __decorate([
 ], WalletController.prototype, "deposit", null);
 __decorate([
     (0, common_1.Post)('transfer'),
-    (0, swagger_1.ApiOperation)({ summary: 'Transfer funds to another user (Email or Wallet Address)' }),
-    (0, swagger_1.ApiBody)({ schema: { type: 'object', properties: { recipient: { type: 'string', example: 'receiver@example.com or 0x...' }, amount: { type: 'number', example: 50 } } } }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Transfer funds to another user (Email or Wallet Address)',
+    }),
+    (0, swagger_1.ApiBody)({
+        schema: {
+            type: 'object',
+            properties: {
+                recipient: { type: 'string', example: 'receiver@example.com or 0x...' },
+                amount: { type: 'number', example: 50 },
+            },
+        },
+    }),
     __param(0, (0, common_1.Request)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -88,7 +103,12 @@ __decorate([
 __decorate([
     (0, common_1.Post)('withdraw'),
     (0, swagger_1.ApiOperation)({ summary: 'Immediate withdrawal (simulated)' }),
-    (0, swagger_1.ApiBody)({ schema: { type: 'object', properties: { amount: { type: 'number', example: 100 } } } }),
+    (0, swagger_1.ApiBody)({
+        schema: {
+            type: 'object',
+            properties: { amount: { type: 'number', example: 100 } },
+        },
+    }),
     __param(0, (0, common_1.Request)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -98,7 +118,10 @@ __decorate([
 __decorate([
     (0, common_1.Post)('withdraw-request'),
     (0, swagger_1.ApiOperation)({ summary: 'Request a withdrawal via PIX' }),
-    (0, swagger_1.ApiResponse)({ status: 201, description: 'Withdrawal requested successfully.' }),
+    (0, swagger_1.ApiResponse)({
+        status: 201,
+        description: 'Withdrawal requested successfully.',
+    }),
     __param(0, (0, common_1.Request)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),

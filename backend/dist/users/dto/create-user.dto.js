@@ -20,13 +20,19 @@ class CreateUserDto {
 }
 exports.CreateUserDto = CreateUserDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'user@example.com', description: 'The email of the user' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'user@example.com',
+        description: 'The email of the user',
+    }),
     (0, class_validator_1.IsEmail)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], CreateUserDto.prototype, "email", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'password123', description: 'The password of the user' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'password123',
+        description: 'The password of the user',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
@@ -38,7 +44,12 @@ __decorate([
     __metadata("design:type", String)
 ], CreateUserDto.prototype, "name", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'user', description: 'The role of the user', required: false, enum: ['user', 'admin', 'company'] }),
+    (0, swagger_1.ApiProperty)({
+        example: 'user',
+        description: 'The role of the user',
+        required: false,
+        enum: ['user', 'admin', 'company'],
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
