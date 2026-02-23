@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: adapta-way-backend
+    env: node
+    rootDir: backend
+    plan: free
+    autoDeploy: true
+    buildCommand: npm install && npm run build
+    startCommand: npm run start:prod
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: JWT_SECRET
+        sync: false
+      - key: DB_TYPE
+        value: sqlite
+    healthCheckPath: /
