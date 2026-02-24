@@ -10,7 +10,7 @@ import { t, useLang } from '../../../lib/i18n';
 export default function AdminUsersPage() {
   useLang();
   const { user, loading: authLoading } = useAuth();
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
