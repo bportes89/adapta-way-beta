@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
+import { QRCodeSVG } from 'qrcode.react';
 import api from '../../lib/api';
 import Navbar from '../../components/Navbar';
 import { formatNumber } from '../../lib/utils';
@@ -30,6 +31,8 @@ export default function DashboardPage() {
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
   const [depositAmount, setDepositAmount] = useState('');
   const [isDepositing, setIsDepositing] = useState(false);
+  const [depositStep, setDepositStep] = useState<'amount' | 'pix'>('amount');
+  const [pixCode, setPixCode] = useState('');
 
   // Transfer Modal State
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
@@ -86,11 +89,19 @@ export default function DashboardPage() {
       return;
     }
 
+    // Generate Fake PIX Code
+    const randomHash = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    setPixCode(`00020126580014BR.GOV.BCB.PIX0136${randomHash}520400005303986540${Number(depositAmount).toFixed(2).replace('.', '')}5802BR5913ADAPTA WAY6008BRASILIA62070503***6304${randomHash.substring(0, 4).toUpperCase()}`);
+    setDepositStep('pix');
+  };
+
+  const confirmDepositPayment = async () => {
     setIsDepositing(true);
     try {
       await api.post('/wallet/deposit', { amount: Number(depositAmount) });
       alert(t('deposit_success'));
       setDepositAmount('');
+      setDepositStep('amount');
       setIsDepositModalOpen(false);
       fetchData(); // Refresh balance and history
     } catch (error) {
@@ -321,42 +332,93 @@ export default function DashboardPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm px-4 py-8 overflow-y-auto">
           <div className="bg-[#111] p-6 sm:p-8 rounded-2xl w-full max-w-md border border-[#C5A065]/20 relative shadow-2xl shadow-[#C5A065]/10 my-auto">
             <button 
-              onClick={() => setIsDepositModalOpen(false)}
+              onClick={() => {
+                setIsDepositModalOpen(false);
+                setDepositStep('amount');
+              }}
               className="absolute top-4 right-4 text-gray-500 hover:text-white transition p-2"
             >
               ✕
             </button>
             
-            <h2 className="text-2xl font-light text-white mb-2">{t('deposit_funds')}</h2>
-            <div className="h-0.5 w-12 bg-[#C5A065] mb-6"></div>
-            
-            <p className="text-gray-400 mb-8 text-sm leading-relaxed">
-              {t('enter_amount_pix_hint')}
-            </p>
-            
-            <form onSubmit={handleDeposit} className="space-y-6">
-              <div>
-                <label className="block text-xs font-bold text-[#C5A065] uppercase tracking-wider mb-2">{t('amount_brl_label')}</label>
-                <input 
-                  type="number" 
-                  step="0.01"
-                  min="0.01"
-                  required
-                  value={depositAmount}
-                  onChange={(e) => setDepositAmount(e.target.value)}
-                  className="w-full bg-[#000] border border-white/10 rounded-lg p-4 text-white focus:outline-none focus:border-[#C5A065] transition text-lg"
-                  placeholder={t('amount_placeholder_brl')}
-                />
-              </div>
-              
-              <button 
-                type="submit" 
-                disabled={isDepositing}
-                className={`w-full py-4 rounded-full font-bold transition uppercase tracking-wide text-sm ${isDepositing ? 'bg-[#333] text-gray-500 cursor-not-allowed' : 'bg-[#C5A065] text-black hover:bg-[#D4AF37]'}`}
-              >
-                {isDepositing ? t('processing') : t('confirm_deposit')}
-              </button>
-            </form>
+            {depositStep === 'amount' ? (
+              <>
+                <h2 className="text-2xl font-light text-white mb-2">{t('deposit_funds')}</h2>
+                <div className="h-0.5 w-12 bg-[#C5A065] mb-6"></div>
+                
+                <p className="text-gray-400 mb-8 text-sm leading-relaxed">
+                  {t('enter_amount_pix_hint')}
+                </p>
+                
+                <form onSubmit={handleDeposit} className="space-y-6">
+                  <div>
+                    <label className="block text-xs font-bold text-[#C5A065] uppercase tracking-wider mb-2">{t('amount_brl_label')}</label>
+                    <input 
+                      type="number" 
+                      step="0.01"
+                      min="0.01"
+                      required
+                      value={depositAmount}
+                      onChange={(e) => setDepositAmount(e.target.value)}
+                      className="w-full bg-[#000] border border-white/10 rounded-lg p-4 text-white focus:outline-none focus:border-[#C5A065] transition text-lg"
+                      placeholder={t('amount_placeholder_brl')}
+                    />
+                  </div>
+                  
+                  <button 
+                    type="submit" 
+                    disabled={isDepositing}
+                    className={`w-full py-4 rounded-full font-bold transition uppercase tracking-wide text-sm ${isDepositing ? 'bg-[#333] text-gray-500 cursor-not-allowed' : 'bg-[#C5A065] text-black hover:bg-[#D4AF37]'}`}
+                  >
+                    {isDepositing ? t('processing') : t('confirm_deposit')}
+                  </button>
+                </form>
+              </>
+            ) : (
+              <>
+                <h2 className="text-2xl font-light text-white mb-2">{t('pay_pix_title')}</h2>
+                <div className="h-0.5 w-12 bg-[#C5A065] mb-6"></div>
+
+                <p className="text-gray-400 mb-6 text-sm leading-relaxed text-center">
+                  {t('pay_pix_instruction')}
+                </p>
+
+                <div className="flex justify-center mb-6 bg-white p-4 rounded-lg w-fit mx-auto">
+                  <QRCodeSVG value={pixCode} size={200} />
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold text-[#C5A065] uppercase tracking-wider mb-2">{t('pix_copy_paste')}</label>
+                    <div className="flex space-x-2">
+                      <input 
+                        type="text" 
+                        readOnly
+                        value={pixCode}
+                        className="w-full bg-[#000] border border-white/10 rounded-lg p-3 text-white text-xs font-mono truncate"
+                      />
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(pixCode);
+                          alert(t('code_copied'));
+                        }}
+                        className="bg-[#222] text-[#C5A065] px-4 rounded-lg font-bold hover:bg-[#333] transition border border-[#C5A065]/30 shrink-0"
+                      >
+                        {t('copy')}
+                      </button>
+                    </div>
+                  </div>
+
+                  <button 
+                    onClick={confirmDepositPayment}
+                    disabled={isDepositing}
+                    className={`w-full py-4 rounded-full font-bold transition uppercase tracking-wide text-sm ${isDepositing ? 'bg-[#333] text-gray-500 cursor-not-allowed' : 'bg-[#C5A065] text-black hover:bg-[#D4AF37]'}`}
+                  >
+                    {isDepositing ? t('processing') : t('confirm_payment')}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
