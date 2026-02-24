@@ -28,6 +28,7 @@ export default function DashboardPage() {
   const [myAssets, setMyAssets] = useState<any[]>([]);
   const [recentTransactions, setRecentTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isAddressCopied, setIsAddressCopied] = useState(false);
   
   // Deposit Modal State
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
@@ -211,6 +212,14 @@ export default function DashboardPage() {
     }
   };
 
+  const handleCopyAddress = () => {
+    if (walletAddress) {
+      navigator.clipboard.writeText(walletAddress);
+      setIsAddressCopied(true);
+      setTimeout(() => setIsAddressCopied(false), 2000);
+    }
+  };
+
   return (
     <div className="bg-black min-h-screen text-white font-sans">
       <Navbar />
@@ -273,10 +282,10 @@ export default function DashboardPage() {
                       {walletAddress.substring(0, 10)}...{walletAddress.substring(walletAddress.length - 6)}
                     </span>
                     <button 
-                      onClick={() => navigator.clipboard.writeText(walletAddress)}
-                      className="text-xs text-[#C5A065] hover:text-[#D4AF37] font-medium uppercase tracking-wide"
+                      onClick={handleCopyAddress}
+                      className={`text-xs font-medium uppercase tracking-wide transition-all ${isAddressCopied ? 'text-green-500 font-bold' : 'text-[#C5A065] hover:text-[#D4AF37]'}`}
                     >
-                      {t('copy')}
+                      {isAddressCopied ? (t('code_copied') || 'Copiado!') : t('copy')}
                     </button>
                  </div>
                )}
