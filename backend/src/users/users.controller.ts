@@ -24,6 +24,7 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { UpdateUserStatusDto } from './dto/update-user-status.dto';
+import { UpdateUserRoleDto } from './dto/update-user-role.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -85,5 +86,14 @@ export class UsersController {
   @ApiOperation({ summary: 'Update user status (block/unblock) (Admin only)' })
   updateStatus(@Param('id') id: string, @Body() body: UpdateUserStatusDto) {
     return this.usersService.updateStatus(id, body.status);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  @Patch(':id/role')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update user role (Admin only)' })
+  updateRole(@Param('id') id: string, @Body() body: UpdateUserRoleDto) {
+    return this.usersService.updateRole(id, body.role);
   }
 }

@@ -110,4 +110,8 @@ export class UsersService {
   async updateStatus(id: string, status: string) {
     return this.usersRepository.update(id, { status });
   }
+
+  async updateRole(id: string, role: string) {
+    return this.usersRepository.update(id, { role });
+  }
 }

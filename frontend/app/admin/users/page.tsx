@@ -61,6 +61,23 @@ export default function AdminUsersPage() {
     }
   };
 
+  const handleUpdateRole = async (userId: string, currentRole: string) => {
+    const newRole = currentRole === 'admin' ? 'user' : 'admin';
+    const message = currentRole === 'admin' 
+      ? 'Tem certeza que deseja remover as permissões de ADMIN deste usuário?' 
+      : 'Tem certeza que deseja tornar este usuário um ADMIN? Ele terá acesso total ao sistema.';
+      
+    if (!confirm(message)) return;
+
+    try {
+      await api.patch(`/users/${userId}/role`, { role: newRole });
+      fetchUsers();
+    } catch (error) {
+      console.error('Failed to update role', error);
+      alert('Failed to update role');
+    }
+  };
+
   const handleToggleStatus = async (userId: string, currentStatus: string) => {
     const newStatus = currentStatus === 'blocked' ? 'active' : 'blocked';
     if (!confirm(`Are you sure you want to ${newStatus} this user?`)) return;
@@ -176,6 +193,18 @@ export default function AdminUsersPage() {
                       </span>
                     </td>
                     <td className="px-6 py-5 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                      {user?.id !== u.id && (
+                        <button
+                          onClick={() => handleUpdateRole(u.id, u.role || 'user')}
+                          className={`text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full transition ${
+                            u.role === 'admin'
+                              ? 'bg-transparent border border-purple-500 text-purple-500 hover:bg-purple-500 hover:text-white'
+                              : 'bg-purple-500/10 text-purple-500 border border-purple-500/30 hover:bg-purple-500 hover:text-black'
+                          }`}
+                        >
+                          {u.role === 'admin' ? 'Remover Admin' : 'Tornar Admin'}
+                        </button>
+                      )}
                       <button
                         onClick={() => handleManageBalance(u)}
                         className="text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full bg-[#C5A065]/10 text-[#C5A065] border border-[#C5A065]/30 hover:bg-[#C5A065] hover:text-black transition"
