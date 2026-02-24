@@ -149,6 +149,40 @@ export class WalletController {
     return this.walletService.rejectWithdrawal(id);
   }
 
+  @Post('admin/mint')
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  @ApiOperation({ summary: 'Mint AdaptaCoins for a user (Admin only)' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        userId: { type: 'string' },
+        amount: { type: 'number' },
+      },
+    },
+  })
+  mint(@Body() body: { userId: string; amount: number }) {
+    return this.walletService.mint(body.userId, body.amount);
+  }
+
+  @Post('admin/burn')
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  @ApiOperation({ summary: 'Burn AdaptaCoins from a user (Admin only)' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        userId: { type: 'string' },
+        amount: { type: 'number' },
+      },
+    },
+  })
+  burn(@Body() body: { userId: string; amount: number }) {
+    return this.walletService.burn(body.userId, body.amount);
+  }
+
   @Get('history')
   @ApiOperation({ summary: 'Get transaction history' })
   getHistory(@Request() req: any) {

@@ -32,7 +32,19 @@ export class AssetsService {
       ...createAssetDto,
       availableSupply: createAssetDto.totalSupply,
     });
-    return this.assetRepository.save(asset);
+    const savedAsset = await this.assetRepository.save(asset);
+
+    // Blockchain Record
+    await this.blockchainService.createBlock({
+      type: 'ASSET_CREATION',
+      assetId: savedAsset.id,
+      name: savedAsset.name,
+      totalSupply: savedAsset.totalSupply,
+      referenceValue: savedAsset.referenceValue,
+      timestamp: new Date().toISOString(),
+    });
+
+    return savedAsset;
   }
 
   findAll() {
@@ -76,12 +88,12 @@ export class AssetsService {
 
       if (!wallet) throw new NotFoundException('Wallet not found');
 
-      if (wallet.balance < totalCost) {
-        throw new BadRequestException('Insufficient balance to buy assets');
+      if (Number(wallet.adaptaCoinBalance) < totalCost) {
+        throw new BadRequestException('Insufficient AdaptaCoin balance to buy assets');
       }
 
       // Deduct balance
-      wallet.balance = Number(wallet.balance) - Number(totalCost);
+      wallet.adaptaCoinBalance = Number(wallet.adaptaCoinBalance) - Number(totalCost);
       await queryRunner.manager.save(wallet);
 
       // Update asset supply
@@ -108,6 +120,7 @@ export class AssetsService {
       // Record Transaction
       const transaction = new Transaction();
       transaction.amount = totalCost;
+      transaction.currency = 'ADAPTA';
       transaction.type = TransactionType.BUY_ASSET;
       transaction.fromWallet = wallet;
       transaction.timestamp = new Date();
@@ -116,12 +129,13 @@ export class AssetsService {
       await queryRunner.commitTransaction();
 
       // Blockchain Record
-      this.blockchainService.createBlock({
+      await this.blockchainService.createBlock({
         type: 'BUY_ASSET',
         walletId: wallet.id,
         assetId: asset.id,
         amount: amount,
         totalCost: totalCost,
+        currency: 'ADAPTA',
         timestamp: new Date().toISOString(),
       });
 

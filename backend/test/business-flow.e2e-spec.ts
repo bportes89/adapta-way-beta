@@ -75,6 +75,17 @@ describe('Business Flow (e2e)', () => {
     expect(Number(res.body.newBalance)).toBe(1000);
   });
 
+  it('3.5 User Converts BRL to AdaptaCoin', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/wallet/convert')
+      .set('Authorization', `Bearer ${userToken}`)
+      .send({ amount: 500, fromCurrency: 'BRL' })
+      .expect(201);
+
+    expect(Number(res.body.newBalance)).toBe(500); // Remaining BRL
+    expect(Number(res.body.newAdaptaCoinBalance)).toBe(500); // New AdaptaCoin
+  });
+
   it('4. Admin Creates Asset', async () => {
     const res = await request(app.getHttpServer())
       .post('/assets')
@@ -98,13 +109,14 @@ describe('Business Flow (e2e)', () => {
       .send({ amount: 10 })
       .expect(201); // 10 * 10 = 100 cost
 
-    // Check Balance (Should be 900)
+    // Check Balance (Should have 500 BRL and 400 AdaptaCoins)
     const balRes = await request(app.getHttpServer())
       .get('/wallet/balance')
       .set('Authorization', `Bearer ${userToken}`)
       .expect(200);
 
-    expect(Number(balRes.body.balance)).toBe(900);
+    expect(Number(balRes.body.balance)).toBe(500);
+    expect(Number(balRes.body.adaptaCoinBalance)).toBe(400);
 
     // Check Assets
     const assetsRes = await request(app.getHttpServer())
@@ -147,5 +159,30 @@ describe('Business Flow (e2e)', () => {
       .expect(200);
 
     expect(res.text).toBe('true');
+  });
+
+  it('8. Admin Mints AdaptaCoins', async () => {
+    // Get user ID from token
+    const profileRes = await request(app.getHttpServer())
+      .get('/auth/profile')
+      .set('Authorization', `Bearer ${userToken}`)
+      .expect(200);
+    
+    const userId = profileRes.body.userId;
+
+    await request(app.getHttpServer())
+      .post('/wallet/admin/mint')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ userId, amount: 1000 })
+      .expect(201);
+
+    // Verify balance
+    const balRes = await request(app.getHttpServer())
+      .get('/wallet/balance')
+      .set('Authorization', `Bearer ${userToken}`)
+      .expect(200);
+
+    // Previous balance was 400 + 1000 = 1400
+    expect(Number(balRes.body.adaptaCoinBalance)).toBe(1400);
   });
 });
