@@ -12,6 +12,11 @@ export default function AdminUsersPage() {
   const { user, loading: authLoading } = useAuth();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isBalanceModalOpen, setIsBalanceModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [balanceAmount, setBalanceAmount] = useState('');
+  const [balanceAction, setBalanceAction] = useState<'mint' | 'burn'>('mint');
+  const [processingBalance, setProcessingBalance] = useState(false);
 
   useEffect(() => {
     if (user?.role === 'admin') {
@@ -40,6 +45,45 @@ export default function AdminUsersPage() {
     } catch (error) {
       console.error('Failed to update status', error);
       alert('Failed to update status');
+    }
+  };
+
+  const handleManageBalance = (user: any) => {
+    setSelectedUser(user);
+    setBalanceAmount('');
+    setBalanceAction('mint');
+    setIsBalanceModalOpen(true);
+  };
+
+  const confirmBalanceAction = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedUser || !balanceAmount || Number(balanceAmount) <= 0) {
+      alert(t('valid_amount'));
+      return;
+    }
+
+    setProcessingBalance(true);
+    try {
+      if (balanceAction === 'mint') {
+        await api.post('/wallet/admin/mint', {
+          userId: selectedUser.id,
+          amount: Number(balanceAmount)
+        });
+        alert('AdaptaCoins emitidos com sucesso!');
+      } else {
+        await api.post('/wallet/admin/burn', {
+          userId: selectedUser.id,
+          amount: Number(balanceAmount)
+        });
+        alert('AdaptaCoins queimados com sucesso!');
+      }
+      setIsBalanceModalOpen(false);
+      fetchUsers();
+    } catch (error: any) {
+      console.error('Failed to update balance', error);
+      alert(error.response?.data?.message || 'Falha na operação');
+    } finally {
+      setProcessingBalance(false);
     }
   };
 
@@ -92,7 +136,13 @@ export default function AdminUsersPage() {
                         {u.status || 'active'}
                       </span>
                     </td>
-                    <td className="px-6 py-5 whitespace-nowrap text-right text-sm font-medium">
+                    <td className="px-6 py-5 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                      <button
+                        onClick={() => handleManageBalance(u)}
+                        className="text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full bg-[#C5A065]/10 text-[#C5A065] border border-[#C5A065]/30 hover:bg-[#C5A065] hover:text-black transition"
+                      >
+                        Gerenciar AC
+                      </button>
                       {u.role !== 'admin' && (
                         <button 
                           onClick={() => handleToggleStatus(u.id, u.status || 'active')}
@@ -110,6 +160,64 @@ export default function AdminUsersPage() {
             </table>
           </div>
         </div>
+
+        {/* Balance Modal */}
+        {isBalanceModalOpen && selectedUser && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm px-4">
+            <div className="bg-[#111] p-8 rounded-2xl w-full max-w-md border border-[#C5A065]/20 relative shadow-2xl">
+              <button 
+                onClick={() => setIsBalanceModalOpen(false)}
+                className="absolute top-4 right-4 text-gray-500 hover:text-white transition"
+              >
+                ✕
+              </button>
+              
+              <h2 className="text-2xl font-light text-white mb-2">Gerenciar AdaptaCoins</h2>
+              <div className="text-sm text-gray-400 mb-6">Usuário: <span className="text-[#C5A065]">{selectedUser.name}</span></div>
+              
+              <form onSubmit={confirmBalanceAction} className="space-y-6">
+                <div className="flex space-x-4 mb-4">
+                    <button
+                        type="button"
+                        onClick={() => setBalanceAction('mint')}
+                        className={`flex-1 py-3 rounded-lg font-bold border transition ${balanceAction === 'mint' ? 'bg-[#C5A065] text-black border-[#C5A065]' : 'bg-black text-gray-500 border-white/10'}`}
+                    >
+                        Emitir (Mint)
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setBalanceAction('burn')}
+                        className={`flex-1 py-3 rounded-lg font-bold border transition ${balanceAction === 'burn' ? 'bg-red-900/20 text-red-500 border-red-500/50' : 'bg-black text-gray-500 border-white/10'}`}
+                    >
+                        Queimar (Burn)
+                    </button>
+                </div>
+
+                <div>
+                    <label className="block text-xs font-bold text-[#C5A065] uppercase tracking-wider mb-2">Quantidade (AC)</label>
+                    <input 
+                        type="number" 
+                        step="0.01"
+                        min="0.01"
+                        required
+                        value={balanceAmount}
+                        onChange={(e) => setBalanceAmount(e.target.value)}
+                        className="w-full bg-[#000] border border-white/10 rounded-lg p-4 text-white focus:outline-none focus:border-[#C5A065] transition text-lg"
+                        placeholder="0.00"
+                    />
+                </div>
+
+                <button 
+                    type="submit" 
+                    disabled={processingBalance}
+                    className={`w-full py-4 rounded-full font-bold transition uppercase tracking-wide text-sm ${processingBalance ? 'bg-[#333] text-gray-500 cursor-not-allowed' : balanceAction === 'mint' ? 'bg-[#C5A065] text-black hover:bg-[#D4AF37]' : 'bg-red-600 text-white hover:bg-red-700'}`}
+                >
+                    {processingBalance ? 'Processando...' : balanceAction === 'mint' ? 'Confirmar Emissão' : 'Confirmar Queima'}
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
