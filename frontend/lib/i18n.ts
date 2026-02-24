@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react';
+
 export type Lang = 'pt' | 'en';
 
 const STORAGE_KEY = 'lang';
@@ -337,4 +339,18 @@ export function setLang(lang: Lang) {
 export function t(key: string): string {
   const table = dict[current] || dict.pt;
   return table[key] || key;
+}
+
+export function useLang() {
+  const [lang, setLangState] = useState(current);
+
+  useEffect(() => {
+    const handleLangChange = () => setLangState(current);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('langchange', handleLangChange);
+      return () => window.removeEventListener('langchange', handleLangChange);
+    }
+  }, []);
+
+  return lang;
 }

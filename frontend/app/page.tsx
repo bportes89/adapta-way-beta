@@ -1,7 +1,10 @@
+'use client';
+
 import Link from "next/link";
-import { t } from "../lib/i18n";
+import { t, useLang } from "../lib/i18n";
 
 export default function Home() {
+  useLang();
   return (
     <div className="min-h-screen bg-black text-white font-sans flex flex-col relative overflow-hidden">
       <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-5 z-0"></div>

@@ -5,9 +5,10 @@ import api from '../../../lib/api';
 import { useAuth } from '../../../context/AuthContext';
 import Link from 'next/link';
 import Navbar from '../../../components/Navbar';
-import { t } from '../../../lib/i18n';
+import { t, useLang } from '../../../lib/i18n';
 
 export default function AdminAssetsPage() {
+  useLang();
   const { user, loading: authLoading } = useAuth();
   const [assets, setAssets] = useState([]);
   const [loading, setLoading] = useState(true);

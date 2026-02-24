@@ -4,9 +4,10 @@ import React from 'react';
 import { useAuth } from '../../context/AuthContext';
 import Link from 'next/link';
 import Navbar from '../../components/Navbar';
-import { t } from '../../lib/i18n';
+import { t, useLang } from '../../lib/i18n';
 
 export default function AdminDashboard() {
+  useLang();
   const { user, loading } = useAuth();
 
   if (loading) return <div className="min-h-screen bg-[#141414] text-white flex items-center justify-center">{t('loading')}</div>;

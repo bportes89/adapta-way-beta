@@ -5,9 +5,10 @@ import { useAuth } from '../../context/AuthContext';
 import api from '../../lib/api';
 import Navbar from '../../components/Navbar';
 import Link from 'next/link';
-import { t } from '../../lib/i18n';
+import { t, useLang } from '../../lib/i18n';
 
 export default function NftsPage() {
+  useLang();
   const { user, loading: authLoading } = useAuth();
   const [nfts, setNfts] = useState([]);
   const [myNfts, setMyNfts] = useState([]);

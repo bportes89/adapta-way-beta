@@ -5,9 +5,10 @@ import { useAuth } from '../../context/AuthContext';
 import api from '../../lib/api';
 import Navbar from '../../components/Navbar';
 import { formatNumber } from '../../lib/utils';
-import { t } from '../../lib/i18n';
+import { t, useLang } from '../../lib/i18n';
 
 export default function AssetsPage() {
+  useLang();
   const { user, loading: authLoading } = useAuth();
   const [assets, setAssets] = useState([]);
   const [myAssets, setMyAssets] = useState([]);

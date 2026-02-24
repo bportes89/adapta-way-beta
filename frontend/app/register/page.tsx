@@ -4,9 +4,10 @@ import React, { useState } from 'react';
 import api from '../../lib/api';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { t } from '../../lib/i18n';
+import { t, useLang } from '../../lib/i18n';
 
 export default function RegisterPage() {
+  useLang();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

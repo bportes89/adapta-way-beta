@@ -4,14 +4,15 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
-import { t, getLang, setLang } from '../lib/i18n';
+import { t, getLang, setLang, useLang } from '../lib/i18n';
 
 export default function Navbar() {
+  useLang();
   const { user, logout } = useAuth();
   const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
-  const [lang, setLangState] = useState(getLang());
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const lang = getLang();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -23,8 +24,6 @@ export default function Navbar() {
     };
 
     window.addEventListener('scroll', handleScroll);
-    const onLangChange = () => setLangState(getLang());
-    window.addEventListener('langchange', onLangChange as EventListener);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -36,7 +35,6 @@ export default function Navbar() {
   const toggleLang = () => {
     const next = lang === 'pt' ? 'en' : 'pt';
     setLang(next);
-    setLangState(next);
   };
 
   return (

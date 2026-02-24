@@ -5,7 +5,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import api from '../../lib/api';
 import Navbar from '../../components/Navbar';
 import { formatNumber } from '../../lib/utils';
-import { t } from '../../lib/i18n';
+import { t, useLang } from '../../lib/i18n';
 import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/navigation';
 
@@ -17,6 +17,7 @@ const featuredAsset = {
 };
 
 export default function DashboardPage() {
+  useLang();
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const contentRef = useRef<HTMLDivElement | null>(null);

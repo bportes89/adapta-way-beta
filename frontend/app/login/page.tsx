@@ -5,9 +5,10 @@ import api from '../../lib/api';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '../../context/AuthContext';
-import { t } from '../../lib/i18n';
+import { t, useLang } from '../../lib/i18n';
 
 export default function LoginPage() {
+  useLang();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
