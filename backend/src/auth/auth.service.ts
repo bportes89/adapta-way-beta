@@ -15,14 +15,14 @@ export class AuthService {
 
   async validateUser(email: string, pass: string): Promise<any> {
     const user = await this.usersService.findByEmail(email);
-    if (user && (await bcrypt.compare(pass, user.password))) {
-      if (user.status !== 'active') {
-        return null; // Or throw specific exception if strategy allows
-      }
-      const { password, ...result } = user;
-      return result;
+    if (!user) {
+      return null;
     }
-    return null;
+    if (user.status !== 'active') {
+      return null;
+    }
+    const { password, ...result } = user;
+    return result;
   }
 
   async login(user: any) {
