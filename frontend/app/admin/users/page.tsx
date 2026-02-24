@@ -12,6 +12,10 @@ export default function AdminUsersPage() {
   const { user, loading: authLoading } = useAuth();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [isBalanceModalOpen, setIsBalanceModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [balanceAmount, setBalanceAmount] = useState('');
@@ -19,15 +23,36 @@ export default function AdminUsersPage() {
   const [processingBalance, setProcessingBalance] = useState(false);
 
   useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1); // Reset to page 1 on search
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [search]);
+
+  useEffect(() => {
     if (user?.role === 'admin') {
       fetchUsers();
     }
-  }, [user]);
+  }, [user, page, debouncedSearch]);
 
   const fetchUsers = async () => {
     try {
-      const response = await api.get('/users');
-      setUsers(response.data);
+      const response = await api.get('/users', {
+        params: {
+          page,
+          limit: 10,
+          search: debouncedSearch
+        }
+      });
+      // Handle both old array format and new paginated format for backward compatibility if needed
+      if (Array.isArray(response.data)) {
+         setUsers(response.data);
+         setTotalPages(1);
+      } else {
+         setUsers(response.data.data);
+         setTotalPages(response.data.meta.last_page);
+      }
     } catch (error) {
       console.error('Failed to fetch users', error);
     } finally {
@@ -103,6 +128,17 @@ export default function AdminUsersPage() {
           <Link href="/admin" className="text-[#C5A065] hover:text-[#D4AF37] transition text-sm uppercase tracking-wider font-bold">{t('back_to_admin')}</Link>
         </div>
 
+        {/* Search Bar */}
+        <div className="mb-6">
+          <input
+            type="text"
+            placeholder={t('search_placeholder') || 'Buscar por nome ou email...'}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full bg-[#111] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#C5A065] transition"
+          />
+        </div>
+
         <div className="bg-[#111] rounded-2xl border border-white/5 overflow-hidden shadow-2xl">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-white/5">
@@ -159,6 +195,27 @@ export default function AdminUsersPage() {
               </tbody>
             </table>
           </div>
+        </div>
+
+        {/* Pagination Controls */}
+        <div className="flex justify-between items-center mt-6">
+          <button
+            disabled={page <= 1}
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            className="px-4 py-2 bg-[#222] text-white rounded-lg disabled:opacity-50 hover:bg-[#333] transition"
+          >
+            Anterior
+          </button>
+          <span className="text-gray-400">
+            Página <span className="text-white font-bold">{page}</span> de <span className="text-white font-bold">{totalPages}</span>
+          </span>
+          <button
+            disabled={page >= totalPages}
+            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+            className="px-4 py-2 bg-[#222] text-white rounded-lg disabled:opacity-50 hover:bg-[#333] transition"
+          >
+            Próxima
+          </button>
         </div>
 
         {/* Balance Modal */}

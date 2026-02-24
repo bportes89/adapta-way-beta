@@ -1,6 +1,6 @@
 import { Injectable, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Like } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
@@ -43,8 +43,33 @@ export class UsersService {
     return this.usersRepository.save(user);
   }
 
-  findAll() {
-    return this.usersRepository.find();
+  async findAll(options?: any, search?: string) {
+    if (!options) return this.usersRepository.find();
+
+    const page = options.page || 1;
+    const limit = options.limit || 10;
+    const skip = (page - 1) * limit;
+
+    const where = search ? [
+      { name: Like(`%${search}%`) },
+      { email: Like(`%${search}%`) }
+    ] : {};
+
+    const [result, total] = await this.usersRepository.findAndCount({
+      where,
+      take: limit,
+      skip,
+      order: { createdAt: 'DESC' }
+    });
+
+    return {
+      data: result,
+      meta: {
+        total,
+        page,
+        last_page: Math.ceil(total / limit),
+      }
+    };
   }
 
   findOne(id: string) {

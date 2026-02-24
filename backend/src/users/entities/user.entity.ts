@@ -4,6 +4,8 @@ import {
   PrimaryGeneratedColumn,
   OneToOne,
   JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Wallet } from '../../wallet/entities/wallet.entity';
 
@@ -36,4 +38,10 @@ export class User {
   @OneToOne(() => Wallet, (wallet) => wallet.user, { cascade: true })
   @JoinColumn()
   wallet: Wallet;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }

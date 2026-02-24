@@ -142,6 +142,7 @@ const dict: Record<Lang, Record<string, string>> = {
     balance_col: 'Saldo',
     role_col: 'Papel',
     status_col: 'Status',
+    search_placeholder: 'Buscar por nome ou email...',
     // Admin withdrawals
     withdrawals_header_desc: 'Revise e gerencie solicitações de saque via PIX.',
     approve: 'Aprovar',
@@ -297,6 +298,7 @@ const dict: Record<Lang, Record<string, string>> = {
     balance_col: 'Balance',
     role_col: 'Role',
     status_col: 'Status',
+    search_placeholder: 'Search by name or email...',
     // Admin withdrawals
     withdrawals_header_desc: 'Review and manage PIX withdrawal requests.',
     approve: 'Approve',

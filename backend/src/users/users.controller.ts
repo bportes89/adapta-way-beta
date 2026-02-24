@@ -7,6 +7,9 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
+  DefaultValuePipe,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -37,9 +40,18 @@ export class UsersController {
   @Roles('admin')
   @Get()
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get all users (Admin only)' })
-  findAll() {
-    return this.usersService.findAll();
+  @ApiOperation({ summary: 'Get all users (Admin only) with pagination and search' })
+  findAll(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
+    @Query('search') search: string = '',
+  ) {
+    limit = limit > 100 ? 100 : limit;
+    return this.usersService.findAll({
+      page,
+      limit,
+      route: 'http://localhost:3000/users',
+    }, search);
   }
 
   @UseGuards(JwtAuthGuard)
