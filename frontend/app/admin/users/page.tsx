@@ -5,6 +5,7 @@ import api from '../../../lib/api';
 import { useAuth } from '../../../context/AuthContext';
 import Link from 'next/link';
 import Navbar from '../../../components/Navbar';
+import { formatNumber } from '../../../lib/utils';
 import { t, useLang } from '../../../lib/i18n';
 
 export default function AdminUsersPage() {
@@ -146,6 +147,7 @@ export default function AdminUsersPage() {
                 <tr>
                   <th className="px-6 py-5 text-left text-xs font-bold text-[#C5A065] uppercase tracking-wider">{t('name_col')}</th>
                   <th className="px-6 py-5 text-left text-xs font-bold text-[#C5A065] uppercase tracking-wider">{t('email_col')}</th>
+                  <th className="px-6 py-5 text-left text-xs font-bold text-[#C5A065] uppercase tracking-wider">Saldo (AC)</th>
                   <th className="px-6 py-5 text-left text-xs font-bold text-[#C5A065] uppercase tracking-wider">{t('role_col')}</th>
                   <th className="px-6 py-5 text-left text-xs font-bold text-[#C5A065] uppercase tracking-wider">2FA</th>
                   <th className="px-6 py-5 text-left text-xs font-bold text-[#C5A065] uppercase tracking-wider">{t('status_col')}</th>
@@ -157,6 +159,7 @@ export default function AdminUsersPage() {
                   <tr key={u.id} className="hover:bg-white/5 transition duration-200">
                     <td className="px-6 py-5 whitespace-nowrap text-sm font-medium text-white">{u.name}</td>
                     <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-400">{u.email}</td>
+                    <td className="px-6 py-5 whitespace-nowrap text-sm text-[#C5A065] font-mono">{formatNumber(Number(u.wallet?.adaptaCoinBalance || 0))} AC</td>
                     <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-400 uppercase tracking-wide text-xs">{u.role}</td>
                     <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-400">
                         {u.is2faEnabled ? (

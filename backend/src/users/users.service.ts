@@ -57,6 +57,7 @@ export class UsersService {
 
     const [result, total] = await this.usersRepository.findAndCount({
       where,
+      relations: ['wallet'],
       take: limit,
       skip,
       order: { createdAt: 'DESC' }
