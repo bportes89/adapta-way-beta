@@ -204,7 +204,7 @@ export default function DashboardPage() {
       <div ref={contentRef} className="px-4 md:px-12 -mt-20 relative z-10 space-y-16 pb-20">
         
         {/* Wallet Section */}
-        <section>
+        <section className="pt-10">
           <h2 className="text-2xl font-light mb-6 text-[#C5A065] tracking-wide uppercase text-sm">{t('your_wallet')}</h2>
           <div className="bg-[#111] p-6 md:p-8 rounded-2xl border border-white/10 flex flex-col lg:flex-row items-start lg:items-center justify-between shadow-2xl shadow-black/50 gap-8 lg:gap-0">
             <div>
