@@ -29,6 +29,7 @@ export default function DashboardPage() {
   const [recentTransactions, setRecentTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAddressCopied, setIsAddressCopied] = useState(false);
+  const [isPixCopied, setIsPixCopied] = useState(false);
   
   // Deposit Modal State
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
@@ -459,11 +460,12 @@ export default function DashboardPage() {
                       <button
                         onClick={() => {
                           navigator.clipboard.writeText(pixCode);
-                          alert(t('code_copied'));
+                          setIsPixCopied(true);
+                          setTimeout(() => setIsPixCopied(false), 2000);
                         }}
-                        className="bg-[#222] text-[#C5A065] px-4 rounded-lg font-bold hover:bg-[#333] transition border border-[#C5A065]/30 shrink-0"
+                        className={`bg-[#222] px-4 rounded-lg font-bold transition border border-[#C5A065]/30 shrink-0 ${isPixCopied ? 'text-green-500' : 'text-[#C5A065] hover:bg-[#333]'}`}
                       >
-                        {t('copy')}
+                        {isPixCopied ? (t('code_copied') || 'Copiado!') : t('copy')}
                       </button>
                     </div>
                   </div>
