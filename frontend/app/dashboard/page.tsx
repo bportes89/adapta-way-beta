@@ -182,16 +182,16 @@ export default function DashboardPage() {
           <p className="text-lg md:text-xl text-gray-300 drop-shadow-md max-w-lg leading-relaxed">
             {t('featured_asset_desc')}
           </p>
-          <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mt-8">
+          <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 mt-8">
             <button
               onClick={() => setIsIntroOpen(true)}
-              className="bg-[#C5A065] text-black px-8 py-3 rounded-full font-bold hover:bg-[#D4AF37] transition flex items-center justify-center transform hover:scale-105 duration-200 w-full sm:w-auto"
+              className="bg-[#C5A065] text-black px-8 py-3 rounded-full font-bold hover:bg-[#D4AF37] transition flex items-center justify-center transform hover:scale-105 duration-200 w-full md:w-auto"
             >
               <span className="mr-2">▶</span> {t('play_intro')}
             </button>
             <button
               onClick={() => contentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-              className="bg-transparent border border-white/30 text-white px-8 py-3 rounded-full font-bold hover:bg-white/10 transition flex items-center justify-center backdrop-blur-sm w-full sm:w-auto"
+              className="bg-transparent border border-white/30 text-white px-8 py-3 rounded-full font-bold hover:bg-white/10 transition flex items-center justify-center backdrop-blur-sm w-full md:w-auto"
             >
               ℹ {t('more_info')}
             </button>
@@ -225,22 +225,22 @@ export default function DashboardPage() {
                  </div>
                )}
             </div>
-            <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full lg:w-auto">
+            <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 w-full lg:w-auto">
                <button 
                  onClick={() => setIsDepositModalOpen(true)}
-                 className="bg-[#C5A065] text-black px-8 py-3 rounded-full font-bold hover:bg-[#D4AF37] transition transform hover:-translate-y-1 shadow-lg shadow-[#C5A065]/20 w-full sm:w-auto text-center"
+                 className="bg-[#C5A065] text-black px-8 py-3 rounded-full font-bold hover:bg-[#D4AF37] transition transform hover:-translate-y-1 shadow-lg shadow-[#C5A065]/20 w-full md:w-auto text-center"
                >
                  {t('deposit')}
                </button>
                <button 
                  onClick={() => setIsTransferModalOpen(true)}
-                 className="bg-transparent border border-[#C5A065] text-[#C5A065] px-8 py-3 rounded-full font-bold hover:bg-[#C5A065] hover:text-black transition transform hover:-translate-y-1 w-full sm:w-auto text-center"
+                 className="bg-transparent border border-[#C5A065] text-[#C5A065] px-8 py-3 rounded-full font-bold hover:bg-[#C5A065] hover:text-black transition transform hover:-translate-y-1 w-full md:w-auto text-center"
                >
                  {t('transfer')}
                </button>
                <button 
                  onClick={() => setIsWithdrawModalOpen(true)}
-                 className="bg-[#222] text-white border border-white/10 px-8 py-3 rounded-full font-bold hover:bg-[#333] transition transform hover:-translate-y-1 w-full sm:w-auto text-center"
+                 className="bg-[#222] text-white border border-white/10 px-8 py-3 rounded-full font-bold hover:bg-[#333] transition transform hover:-translate-y-1 w-full md:w-auto text-center"
                >
                  {t('withdraw')}
                </button>
