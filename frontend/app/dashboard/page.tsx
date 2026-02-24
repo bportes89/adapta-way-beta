@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import api from '../../lib/api';
 import Navbar from '../../components/Navbar';
+import { formatNumber } from '../../lib/utils';
 import { t } from '../../lib/i18n';
 import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/navigation';
@@ -209,7 +210,7 @@ export default function DashboardPage() {
             <div>
                <p className="text-gray-400 text-sm uppercase tracking-wider mb-2">{t('total_balance')}</p>
                <div className="text-5xl font-light text-white mt-1 break-all">
-                 {loading ? '...' : <span className="flex items-baseline flex-wrap">R$ <span className="font-bold ml-2">{Number(balance).toFixed(2)}</span></span>}
+                 {loading ? '...' : <span className="flex items-baseline flex-wrap">R$ <span className="font-bold ml-2">{formatNumber(Number(balance || 0))}</span></span>}
                </div>
                {walletAddress && (
                  <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
@@ -302,7 +303,7 @@ export default function DashboardPage() {
                         <p className="text-xs text-gray-500 mt-1">{new Date(tx.timestamp).toLocaleDateString()}</p>
                      </div>
                      <span className={`font-mono text-lg ${tx.type === 'DEPOSIT' || tx.type === 'RECEIVED' ? 'text-[#C5A065]' : 'text-white/60'}`}>
-                        {tx.type === 'DEPOSIT' || tx.type === 'RECEIVED' ? '+' : '-'} R$ {Number(tx.amount).toFixed(2)}
+                        {tx.type === 'DEPOSIT' || tx.type === 'RECEIVED' ? '+' : '-'} R$ {formatNumber(tx.amount)}
                      </span>
                   </div>
                </div>

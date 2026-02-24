@@ -5,6 +5,7 @@ import api from '../../../lib/api';
 import { useAuth } from '../../../context/AuthContext';
 import Link from 'next/link';
 import Navbar from '../../../components/Navbar';
+import { formatNumber } from '../../../lib/utils';
 import { t } from '../../../lib/i18n';
 
 export default function AdminWithdrawalsPage() {
@@ -97,7 +98,7 @@ export default function AdminWithdrawalsPage() {
                         {w.user?.email}
                       </td>
                       <td className="px-6 py-5 whitespace-nowrap text-sm text-[#C5A065] font-bold font-mono">
-                        R$ {Number(w.amount).toFixed(2)}
+                        R$ {formatNumber(w.amount)}
                       </td>
                       <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-400 font-mono">
                         {w.pixKey}

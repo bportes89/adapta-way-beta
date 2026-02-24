@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../lib/api';
 import Navbar from '../../components/Navbar';
+import { formatNumber } from '../../lib/utils';
 import { t } from '../../lib/i18n';
 
 export default function AssetsPage() {
@@ -74,7 +75,7 @@ export default function AssetsPage() {
                     </div>
                     <div className="text-right">
                         <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">{t('current_value')}</div>
-                        <div className="text-white font-mono">{Number(item.asset.referenceValue).toFixed(2)} AC</div>
+                        <div className="text-white font-mono">{formatNumber(item.asset.referenceValue)} AC</div>
                     </div>
                   </div>
                 </div>
