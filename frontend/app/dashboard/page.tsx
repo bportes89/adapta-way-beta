@@ -22,6 +22,7 @@ export default function DashboardPage() {
   const contentRef = useRef<HTMLDivElement | null>(null);
   const [isIntroOpen, setIsIntroOpen] = useState(false);
   const [balance, setBalance] = useState<number | null>(null);
+  const [adaptaCoinBalance, setAdaptaCoinBalance] = useState<number | null>(null);
   const [walletAddress, setWalletAddress] = useState<string>('');
   const [myAssets, setMyAssets] = useState<any[]>([]);
   const [recentTransactions, setRecentTransactions] = useState<any[]>([]);
@@ -38,7 +39,14 @@ export default function DashboardPage() {
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
   const [transferRecipient, setTransferRecipient] = useState('');
   const [transferAmount, setTransferAmount] = useState('');
+  const [transferCurrency, setTransferCurrency] = useState<'BRL' | 'ADAPTA'>('BRL');
   const [isTransferring, setIsTransferring] = useState(false);
+
+  // Convert Modal State
+  const [isConvertModalOpen, setIsConvertModalOpen] = useState(false);
+  const [convertAmount, setConvertAmount] = useState('');
+  const [convertFrom, setConvertFrom] = useState<'BRL' | 'ADAPTA'>('BRL');
+  const [isConverting, setIsConverting] = useState(false);
 
   // Withdraw Modal State
   const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
@@ -50,6 +58,7 @@ export default function DashboardPage() {
     try {
       const balanceRes = await api.get('/wallet/balance');
       setBalance(balanceRes.data.balance);
+      setAdaptaCoinBalance(balanceRes.data.adaptaCoinBalance);
       setWalletAddress(balanceRes.data.address || t('wallet_generating'));
 
       const historyRes = await api.get('/wallet/history');
@@ -127,11 +136,13 @@ export default function DashboardPage() {
     try {
       await api.post('/wallet/transfer', { 
           recipient: transferRecipient,
-          amount: Number(transferAmount) 
+          amount: Number(transferAmount),
+          currency: transferCurrency
       });
       alert(t('transfer_success'));
       setTransferAmount('');
       setTransferRecipient('');
+      setTransferCurrency('BRL');
       setIsTransferModalOpen(false);
       fetchData(); // Refresh balance and history
     } catch (error) {
@@ -139,6 +150,32 @@ export default function DashboardPage() {
       alert(t('transfer_fail'));
     } finally {
       setIsTransferring(false);
+    }
+  };
+
+  const handleConvert = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!convertAmount || isNaN(Number(convertAmount)) || Number(convertAmount) <= 0) {
+      alert(t('valid_amount'));
+      return;
+    }
+
+    setIsConverting(true);
+    try {
+      await api.post('/wallet/convert', {
+        amount: Number(convertAmount),
+        fromCurrency: convertFrom
+      });
+      alert('Conversão realizada com sucesso!');
+      setIsConvertModalOpen(false);
+      setConvertAmount('');
+      fetchData(); // Refresh balance and history
+    } catch (error: any) {
+      console.error('Conversion failed:', error);
+      const message = error?.response?.data?.message || 'Falha na conversão. Verifique seu saldo.';
+      alert(message);
+    } finally {
+      setIsConverting(false);
     }
   };
 
@@ -223,6 +260,12 @@ export default function DashboardPage() {
                <div className="text-5xl font-light text-white mt-1 break-all">
                  {loading ? '...' : <span className="flex items-baseline flex-wrap">R$ <span className="font-bold ml-2">{formatNumber(Number(balance || 0))}</span></span>}
                </div>
+               <div className="mt-4">
+                  <p className="text-gray-400 text-sm uppercase tracking-wider mb-1">AdaptaCoin</p>
+                  <div className="text-3xl font-light text-[#C5A065] break-all">
+                     {loading ? '...' : <span className="flex items-baseline flex-wrap"><span className="font-bold mr-2">{formatNumber(Number(adaptaCoinBalance || 0))}</span> ADP</span>}
+                  </div>
+               </div>
                {walletAddress && (
                  <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
                     <span className="text-xs text-gray-500 bg-[#222] px-3 py-1.5 rounded-full font-mono border border-white/5 break-all">
@@ -249,6 +292,12 @@ export default function DashboardPage() {
                  className="bg-transparent border border-[#C5A065] text-[#C5A065] px-8 py-3 rounded-full font-bold hover:bg-[#C5A065] hover:text-black transition transform hover:-translate-y-1 w-full md:w-auto text-center"
                >
                  {t('transfer')}
+               </button>
+               <button 
+                 onClick={() => setIsConvertModalOpen(true)}
+                 className="bg-transparent border border-white/30 text-white px-8 py-3 rounded-full font-bold hover:bg-white/10 transition transform hover:-translate-y-1 w-full md:w-auto text-center"
+               >
+                 {t('convert')}
                </button>
                <button 
                  onClick={() => setIsWithdrawModalOpen(true)}
@@ -442,6 +491,25 @@ export default function DashboardPage() {
             
             <form onSubmit={handleTransfer} className="space-y-6">
               <div>
+                <label className="block text-xs font-bold text-[#C5A065] uppercase tracking-wider mb-2">{t('currency_label')}</label>
+                <div className="flex space-x-4">
+                  <button
+                    type="button"
+                    onClick={() => setTransferCurrency('BRL')}
+                    className={`flex-1 py-3 rounded-lg font-bold border ${transferCurrency === 'BRL' ? 'bg-[#C5A065] text-black border-[#C5A065]' : 'bg-black text-gray-500 border-white/10'}`}
+                  >
+                    Real (R$)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setTransferCurrency('ADAPTA')}
+                    className={`flex-1 py-3 rounded-lg font-bold border ${transferCurrency === 'ADAPTA' ? 'bg-[#C5A065] text-black border-[#C5A065]' : 'bg-black text-gray-500 border-white/10'}`}
+                  >
+                    AdaptaCoin
+                  </button>
+                </div>
+              </div>
+              <div>
                 <label className="block text-xs font-bold text-[#C5A065] uppercase tracking-wider mb-2">{t('recipient_label')}</label>
                 <input 
                   type="text" 
@@ -472,6 +540,80 @@ export default function DashboardPage() {
                 className={`w-full py-4 rounded-full font-bold transition uppercase tracking-wide text-sm ${isTransferring ? 'bg-[#333] text-gray-500 cursor-not-allowed' : 'bg-[#C5A065] text-black hover:bg-[#D4AF37]'}`}
               >
                 {isTransferring ? t('processing') : t('confirm_transfer')}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Convert Modal */}
+      {isConvertModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm px-4 py-8 overflow-y-auto">
+          <div className="bg-[#111] p-6 sm:p-8 rounded-2xl w-full max-w-md border border-[#C5A065]/20 relative shadow-2xl shadow-[#C5A065]/10 my-auto">
+            <button 
+              onClick={() => setIsConvertModalOpen(false)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-white transition p-2"
+            >
+              ✕
+            </button>
+            
+            <h2 className="text-2xl font-light text-white mb-2">{t('convert_funds')}</h2>
+            <div className="h-0.5 w-12 bg-[#C5A065] mb-6"></div>
+            
+            <p className="text-gray-400 mb-8 text-sm leading-relaxed">
+              {t('convert_hint')}
+            </p>
+            
+            <form onSubmit={handleConvert} className="space-y-6">
+              <div>
+                <label className="block text-xs font-bold text-[#C5A065] uppercase tracking-wider mb-2">{t('from_currency')}</label>
+                <div className="flex space-x-4 mb-4">
+                  <button
+                    type="button"
+                    onClick={() => setConvertFrom('BRL')}
+                    className={`flex-1 py-3 rounded-lg font-bold border ${convertFrom === 'BRL' ? 'bg-[#C5A065] text-black border-[#C5A065]' : 'bg-black text-gray-500 border-white/10'}`}
+                  >
+                    Real (R$)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setConvertFrom('ADAPTA')}
+                    className={`flex-1 py-3 rounded-lg font-bold border ${convertFrom === 'ADAPTA' ? 'bg-[#C5A065] text-black border-[#C5A065]' : 'bg-black text-gray-500 border-white/10'}`}
+                  >
+                    AdaptaCoin
+                  </button>
+                </div>
+
+                <div className="flex items-center justify-center mb-4 text-gray-500">
+                    ⬇️
+                </div>
+
+                <label className="block text-xs font-bold text-[#C5A065] uppercase tracking-wider mb-2">{t('to_currency')}</label>
+                <div className="w-full bg-[#1a1a1a] border border-white/10 rounded-lg p-4 text-white text-center font-bold">
+                    {convertFrom === 'BRL' ? 'AdaptaCoin (ADP)' : 'Real (R$)'}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#C5A065] uppercase tracking-wider mb-2">{t('amount_label')}</label>
+                <input 
+                  type="number" 
+                  step="0.01"
+                  min="0.01"
+                  required
+                  value={convertAmount}
+                  onChange={(e) => setConvertAmount(e.target.value)}
+                  className="w-full bg-[#000] border border-white/10 rounded-lg p-4 text-white focus:outline-none focus:border-[#C5A065] transition text-lg"
+                  placeholder="0.00"
+                />
+              </div>
+              
+              <button 
+                type="submit" 
+                disabled={isConverting}
+                className={`w-full py-4 rounded-full font-bold transition uppercase tracking-wide text-sm ${isConverting ? 'bg-[#333] text-gray-500 cursor-not-allowed' : 'bg-[#C5A065] text-black hover:bg-[#D4AF37]'}`}
+              >
+                {isConverting ? t('processing') : t('confirm_conversion')}
               </button>
             </form>
           </div>

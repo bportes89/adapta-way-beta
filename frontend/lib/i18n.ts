@@ -147,6 +147,16 @@ const dict: Record<Lang, Record<string, string>> = {
     // Dashboard demo cards
     demo_asset_label: 'Ativo Demo',
     coming_soon_label: 'Em breve',
+    // Conversion
+    convert: 'Converter',
+    convert_funds: 'Converter Moeda',
+    convert_hint: 'Converta saldo entre Real e AdaptaCoin instantaneamente.',
+    from_currency: 'De',
+    to_currency: 'Para',
+    confirm_conversion: 'Confirmar Conversão',
+    conversion_success: 'Conversão realizada com sucesso!',
+    conversion_fail: 'Falha na conversão.',
+    currency_label: 'Moeda',
   },
   en: {
     home: 'Home',
@@ -292,6 +302,16 @@ const dict: Record<Lang, Record<string, string>> = {
     // Dashboard demo cards
     demo_asset_label: 'Demo Asset',
     coming_soon_label: 'Coming Soon',
+    // Conversion
+    convert: 'Convert',
+    convert_funds: 'Convert Currency',
+    convert_hint: 'Convert balance between Real and AdaptaCoin instantly.',
+    from_currency: 'From',
+    to_currency: 'To',
+    confirm_conversion: 'Confirm Conversion',
+    conversion_success: 'Conversion successful!',
+    conversion_fail: 'Conversion failed.',
+    currency_label: 'Currency',
   },
 };
 

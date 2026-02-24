@@ -19,6 +19,9 @@ export class Wallet {
   @Column('decimal', { default: 0 })
   balance: number;
 
+  @Column('decimal', { default: 0 })
+  adaptaCoinBalance: number;
+
   @OneToOne(() => User, (user) => user.wallet)
   user: User;
 

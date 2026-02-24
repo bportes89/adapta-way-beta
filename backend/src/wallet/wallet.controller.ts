@@ -45,6 +45,28 @@ export class WalletController {
     return this.walletService.deposit(req.user.userId, body.amount);
   }
 
+  @Post('convert')
+  @ApiOperation({ summary: 'Convert between BRL and AdaptaCoin' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        amount: { type: 'number', example: 100 },
+        fromCurrency: { type: 'string', enum: ['BRL', 'ADAPTA'], example: 'BRL' },
+      },
+    },
+  })
+  convert(
+    @Request() req: any,
+    @Body() body: { amount: number; fromCurrency: 'BRL' | 'ADAPTA' },
+  ) {
+    return this.walletService.convert(
+      req.user.userId,
+      body.amount,
+      body.fromCurrency,
+    );
+  }
+
   @Post('transfer')
   @ApiOperation({
     summary: 'Transfer funds to another user (Email or Wallet Address)',
@@ -55,17 +77,19 @@ export class WalletController {
       properties: {
         recipient: { type: 'string', example: 'receiver@example.com or 0x...' },
         amount: { type: 'number', example: 50 },
+        currency: { type: 'string', enum: ['BRL', 'ADAPTA'], example: 'BRL', default: 'BRL' },
       },
     },
   })
   transfer(
     @Request() req: any,
-    @Body() body: { recipient: string; amount: number },
+    @Body() body: { recipient: string; amount: number; currency?: 'BRL' | 'ADAPTA' },
   ) {
     return this.walletService.transfer(
       req.user.userId,
       body.recipient,
       body.amount,
+      body.currency || 'BRL',
     );
   }
 

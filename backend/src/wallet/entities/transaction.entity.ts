@@ -14,6 +14,7 @@ export enum TransactionType {
   MINT = 'MINT',
   BURN = 'BURN',
   BUY_ASSET = 'BUY_ASSET',
+  CONVERSION = 'CONVERSION',
 }
 
 @Entity()
@@ -23,6 +24,9 @@ export class Transaction {
 
   @Column('decimal')
   amount: number;
+
+  @Column({ default: 'BRL' })
+  currency: string;
 
   @Column({
     type: 'simple-enum',
