@@ -1,17 +1,15 @@
 export const formatCurrency = (value: number | string): string => {
   const num = Number(value);
   if (isNaN(num)) return 'R$ 0,00';
-  return new Intl.NumberFormat('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-  }).format(num);
+  const parts = num.toFixed(2).split('.');
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return `R$ ${parts.join(',')}`;
 };
 
 export const formatNumber = (value: number | string): string => {
   const num = Number(value);
   if (isNaN(num)) return '0,00';
-  return new Intl.NumberFormat('pt-BR', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(num);
+  const parts = num.toFixed(2).split('.');
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return parts.join(',');
 };
