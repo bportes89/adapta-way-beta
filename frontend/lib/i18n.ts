@@ -345,6 +345,10 @@ export function useLang() {
   const [lang, setLangState] = useState(current);
 
   useEffect(() => {
+    if (lang !== current) {
+      setLangState(current);
+    }
+
     const handleLangChange = () => setLangState(current);
     if (typeof window !== 'undefined') {
       window.addEventListener('langchange', handleLangChange);

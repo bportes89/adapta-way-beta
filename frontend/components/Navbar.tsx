@@ -4,15 +4,14 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
-import { t, getLang, setLang, useLang } from '../lib/i18n';
+import { t, setLang, useLang } from '../lib/i18n';
 
 export default function Navbar() {
-  useLang();
+  const lang = useLang();
   const { user, logout } = useAuth();
   const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const lang = getLang();
 
   useEffect(() => {
     const handleScroll = () => {
