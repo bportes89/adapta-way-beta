@@ -55,7 +55,7 @@ const dict: Record<Lang, Record<string, string>> = {
     featured_asset_desc: 'Fundo de energia sustentável de alta rentabilidade lastreado em ativos reais.',
     // Dashboard modals
     deposit_funds: 'Depositar Fundos',
-    enter_amount_pix_hint: 'Informe o valor para depósito. No Beta, simula um PIX.',
+    enter_amount_pix_hint: 'Informe o valor para depósito. Simula um PIX.',
     amount_brl_label: 'Valor (R$)',
     amount_placeholder_brl: '0.00',
     confirm_deposit: 'Confirmar Depósito',
@@ -79,7 +79,7 @@ const dict: Record<Lang, Record<string, string>> = {
     hero_subtitle: 'Experimente a próxima evolução da tecnologia financeira. Tokenize ativos, gerencie seu portfólio digital e acesse NFTs utilitários em um ecossistema privado e seguro.',
     get_started: 'Começar',
     create_account_cta: 'Criar Conta',
-    beta_footer: '© 2026 Adapta Way. Todos os direitos reservados. Versão Beta.',
+    beta_footer: '© 2026 Adapta Way. Todos os direitos reservados.',
     // Assets page
     my_portfolio: 'Meu Portfólio',
     you_have_no_assets: 'Você ainda não possui ativos.',
@@ -194,7 +194,7 @@ const dict: Record<Lang, Record<string, string>> = {
     featured_asset_desc: 'High yield sustainable energy fund backed by real assets.',
     // Dashboard modals
     deposit_funds: 'Deposit Funds',
-    enter_amount_pix_hint: 'Enter the amount to deposit. In Beta, simulates a PIX transfer.',
+    enter_amount_pix_hint: 'Enter the amount to deposit. Simulates a PIX transfer.',
     amount_brl_label: 'Amount (R$)',
     amount_placeholder_brl: '0.00',
     confirm_deposit: 'Confirm Deposit',
@@ -218,7 +218,7 @@ const dict: Record<Lang, Record<string, string>> = {
     hero_subtitle: 'Experience the next evolution of financial technology. Tokenize assets, manage your digital portfolio, and access utility NFTs in a private and secure ecosystem.',
     get_started: 'Get Started',
     create_account_cta: 'Create Account',
-    beta_footer: '© 2026 Adapta Way. All rights reserved. Beta Version.',
+    beta_footer: '© 2026 Adapta Way. All rights reserved.',
     // Assets page
     my_portfolio: 'My Portfolio',
     you_have_no_assets: "You don't own any assets yet.",

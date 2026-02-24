@@ -44,7 +44,7 @@ export default function Navbar() {
       <div className="px-4 md:px-12 py-4 flex items-center justify-between">
         <div className="flex items-center space-x-8">
           <Link href="/dashboard" className="text-white text-2xl font-bold tracking-tighter flex items-center z-50 relative">
-             <span className="text-[#C5A065] mr-1">AW</span> Adapta Way Beta
+             <span className="text-[#C5A065] mr-1">AW</span> Adapta Way
           </Link>
           <div className="hidden md:flex space-x-6 text-sm font-medium text-gray-300">
             <Link href="/dashboard" className="hover:text-[#C5A065] transition">{t('home')}</Link>

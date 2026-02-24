@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Adapta Way",
-  description: "Plataforma Adapta Way - Beta",
+  description: "Plataforma Adapta Way",
 };
 
 export const viewport = {
