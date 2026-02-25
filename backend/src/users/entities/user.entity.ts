@@ -23,6 +23,12 @@ export class User {
   @Column()
   name: string;
 
+  @Column({ nullable: true })
+  socialName: string;
+
+  @Column({ nullable: true })
+  photoUrl: string;
+
   @Column({ default: 'user' })
   role: string; // 'admin', 'user', 'company'
 

@@ -5,15 +5,21 @@ import api from '../lib/api';
 import { useRouter } from 'next/navigation';
 
 interface User {
-  id: number;
+  id: string;
+  userId?: string;
   email: string;
+  name: string;
   role: string;
+  socialName?: string;
+  photoUrl?: string;
+  is2faEnabled?: boolean;
 }
 
 interface AuthContextType {
   user: User | null;
   login: (token: string, user: User) => void;
   logout: () => void;
+  updateUser: (userData: Partial<User>) => void;
   isAuthenticated: boolean;
   loading: boolean;
 }
@@ -22,6 +28,7 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   login: () => {},
   logout: () => {},
+  updateUser: () => {},
   isAuthenticated: false,
   loading: true,
 });
@@ -60,8 +67,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     router.push('/login');
   };
 
+  const updateUser = (userData: Partial<User>) => {
+    if (user) {
+      setUser({ ...user, ...userData });
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAuthenticated: !!user, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, updateUser, isAuthenticated: !!user, loading }}>
       {children}
     </AuthContext.Provider>
   );

@@ -76,9 +76,24 @@ export default function Navbar() {
               </div>
             )}
           </div>
-          <div className="text-white text-sm hidden md:block">
-            {user?.email}
+          
+          <div className="hidden md:flex items-center space-x-4">
+             <Link href="/profile" className="flex items-center space-x-3 group">
+               <div className="w-8 h-8 rounded-full overflow-hidden bg-[#222] border border-[#C5A065]/50 group-hover:border-[#C5A065] transition">
+                 {user?.photoUrl ? (
+                   <img src={user.photoUrl} alt="Profile" className="w-full h-full object-cover" />
+                 ) : (
+                   <div className="w-full h-full flex items-center justify-center text-xs font-bold text-[#C5A065]">
+                     {(user?.socialName || user?.name || user?.email || 'U').charAt(0).toUpperCase()}
+                   </div>
+                 )}
+               </div>
+               <span className="text-white text-sm group-hover:text-[#C5A065] transition font-medium">
+                 {user?.socialName || user?.name || user?.email}
+               </span>
+             </Link>
           </div>
+
           <button
             onClick={handleLogout}
             className="text-black text-sm font-bold bg-[#C5A065] px-6 py-2 rounded-full hover:bg-[#D4AF37] transition hidden md:block"
@@ -110,7 +125,8 @@ export default function Navbar() {
           
           <div className="h-px w-16 bg-white/20 my-4"></div>
           
-          <div className="text-gray-400 text-sm">{user?.email}</div>
+          <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-400 text-sm hover:text-[#C5A065] transition">{user?.email}</Link>
+          
           <div className="flex space-x-4">
             <button
               onClick={() => setLang('pt')}
