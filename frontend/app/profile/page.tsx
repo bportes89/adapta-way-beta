@@ -25,6 +25,9 @@ export default function ProfilePage() {
   const [show2faSetup, setShow2faSetup] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState('');
   const [twoFactorCode, setTwoFactorCode] = useState('');
+  
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -98,6 +101,35 @@ export default function ProfilePage() {
     }
   };
 
+  const handlePhotoClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    setUploadingPhoto(true);
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await api.post(`/users/${user.id}/upload-photo`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      setPhotoUrl(response.data.photoUrl);
+      updateUser({ photoUrl: response.data.photoUrl });
+      setMessage('Foto de perfil atualizada com sucesso!');
+    } catch (err: any) {
+      console.error(err);
+      setError('Erro ao fazer upload da foto.');
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
+
   if (authLoading) return <div className="min-h-screen bg-black text-white flex items-center justify-center">Carregando...</div>;
 
   return (
@@ -124,7 +156,10 @@ export default function ProfilePage() {
           {/* Profile Photo Section */}
           <div className="md:col-span-1">
             <div className="bg-[#111] border border-white/10 rounded-2xl p-6 flex flex-col items-center text-center">
-              <div className="w-32 h-32 rounded-full overflow-hidden bg-[#222] mb-4 border-2 border-[#C5A065]">
+              <div 
+                onClick={handlePhotoClick}
+                className="w-32 h-32 rounded-full overflow-hidden bg-[#222] mb-4 border-2 border-[#C5A065] cursor-pointer relative group"
+              >
                 {photoUrl ? (
                   <img src={photoUrl} alt="Profile" className="w-full h-full object-cover" />
                 ) : (
@@ -132,20 +167,33 @@ export default function ProfilePage() {
                     {name.charAt(0)}
                   </div>
                 )}
+                
+                {/* Overlay on hover */}
+                <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  <span className="text-xs font-bold text-white">ALTERAR</span>
+                </div>
+                
+                {/* Loading state */}
+                {uploadingPhoto && (
+                  <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
+                    <div className="w-6 h-6 border-2 border-[#C5A065] border-t-transparent rounded-full animate-spin"></div>
+                  </div>
+                )}
               </div>
+              
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                onChange={handleFileChange} 
+                className="hidden" 
+                accept="image/*"
+              />
+
               <h2 className="text-xl font-bold text-white mb-1">{socialName || name}</h2>
               <p className="text-sm text-gray-500 mb-4">{user?.email}</p>
               
               <div className="w-full">
-                <label className="block text-xs font-bold text-left text-[#C5A065] uppercase tracking-wider mb-2">URL da Foto</label>
-                <input 
-                  type="text" 
-                  value={photoUrl}
-                  onChange={(e) => setPhotoUrl(e.target.value)}
-                  className="w-full bg-[#000] border border-white/10 rounded-lg p-3 text-white text-sm focus:outline-none focus:border-[#C5A065] transition mb-2"
-                  placeholder="https://..."
-                />
-                <p className="text-xs text-gray-500 text-left">Cole o link de uma imagem para alterar sua foto.</p>
+                <p className="text-xs text-gray-500">Clique na imagem para alterar sua foto de perfil.</p>
               </div>
             </div>
           </div>
@@ -154,7 +202,7 @@ export default function ProfilePage() {
           <div className="md:col-span-2 space-y-8">
             
             {/* Personal Info */}
-            <div className="bg-[#111] border border-white/10 rounded-2xl p-8">
+            <div className="bg-[#111] border border-white/10 rounded-2xl p-6 md:p-8">
               <h3 className="text-2xl font-bold mb-6 flex items-center">
                 <span className="w-1 h-8 bg-[#C5A065] mr-4 rounded-full"></span>
                 Informações Pessoais
@@ -195,7 +243,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Security Section */}
-            <div className="bg-[#111] border border-white/10 rounded-2xl p-8">
+            <div className="bg-[#111] border border-white/10 rounded-2xl p-6 md:p-8">
               <h3 className="text-2xl font-bold mb-6 flex items-center">
                 <span className="w-1 h-8 bg-[#C5A065] mr-4 rounded-full"></span>
                 Segurança

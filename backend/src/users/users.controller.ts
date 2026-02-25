@@ -10,7 +10,12 @@ import {
   Query,
   DefaultValuePipe,
   ParseIntPipe,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -95,5 +100,25 @@ export class UsersController {
   @ApiOperation({ summary: 'Update user role (Admin only)' })
   updateRole(@Param('id') id: string, @Body() body: UpdateUserRoleDto) {
     return this.usersService.updateRole(id, body.role);
+  }
+
+  @Post(':id/upload-photo')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Upload user profile photo' })
+  @UseInterceptors(FileInterceptor('file', {
+    storage: diskStorage({
+      destination: './uploads/avatars',
+      filename: (req, file, cb) => {
+        const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('');
+        return cb(null, `${randomName}${extname(file.originalname)}`);
+      },
+    }),
+  }))
+  async uploadPhoto(@Param('id') id: string, @UploadedFile() file: Express.Multer.File) {
+    const baseUrl = process.env.API_URL || 'http://localhost:3001';
+    const photoUrl = `${baseUrl}/uploads/avatars/${file.filename}`;
+    await this.usersService.update(id, { photoUrl });
+    return { photoUrl };
   }
 }
