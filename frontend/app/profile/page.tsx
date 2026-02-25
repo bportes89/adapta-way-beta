@@ -51,6 +51,8 @@ export default function ProfilePage() {
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) return;
+
     setLoading(true);
     setMessage('');
     setError('');
@@ -71,6 +73,7 @@ export default function ProfilePage() {
   };
 
   const handleEnable2FA = async () => {
+    if (!user) return;
     try {
       const response = await api.get('/auth/2fa/generate');
       setQrCodeUrl(response.data);
@@ -82,6 +85,7 @@ export default function ProfilePage() {
   };
 
   const handleConfirm2FA = async () => {
+    if (!user) return;
     try {
       await api.post('/auth/2fa/turn-on', { token: twoFactorCode });
       setShow2faSetup(false);
