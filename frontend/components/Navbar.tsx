@@ -12,6 +12,7 @@ export default function Navbar() {
   const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -31,11 +32,6 @@ export default function Navbar() {
     router.push('/login');
   };
 
-  const toggleLang = () => {
-    const next = lang === 'pt' ? 'en' : 'pt';
-    setLang(next);
-  };
-
   return (
     <nav className={`fixed w-full z-50 transition-colors duration-300 ${scrolled || isMobileMenuOpen ? 'bg-black' : 'bg-transparent'}`}>
       <div className="px-4 md:px-12 py-4 flex items-center justify-between">
@@ -52,12 +48,34 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center space-x-4">
-          <button
-            onClick={toggleLang}
-            className="text-white text-xs border border-white/20 rounded-full px-3 py-1 hover:bg-white/10 transition hidden sm:block"
-          >
-            {t('lang_label')}
-          </button>
+          <div className="relative hidden sm:block">
+            <button
+              onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
+              className="flex items-center space-x-2 text-white text-xs border border-white/20 rounded-full px-3 py-1 hover:bg-white/10 transition"
+            >
+              <img src={lang === 'pt' ? "https://flagcdn.com/w40/br.png" : "https://flagcdn.com/w40/us.png"} alt="Flag" className="w-5 h-3.5 rounded-sm object-cover" />
+              <span>{lang === 'pt' ? 'PT' : 'EN'}</span>
+            </button>
+            
+            {isLangMenuOpen && (
+              <div className="absolute right-0 mt-2 w-40 bg-[#111] border border-white/10 rounded-xl shadow-xl overflow-hidden z-50">
+                <button 
+                  onClick={() => { setLang('pt'); setIsLangMenuOpen(false); }}
+                  className={`w-full text-left px-4 py-3 text-sm hover:bg-white/5 transition flex items-center space-x-3 ${lang === 'pt' ? 'text-[#C5A065] bg-white/5' : 'text-gray-300'}`}
+                >
+                  <img src="https://flagcdn.com/w40/br.png" alt="Brasil" className="w-5 h-3.5 rounded-sm object-cover" />
+                  <span>Português</span>
+                </button>
+                <button 
+                  onClick={() => { setLang('en'); setIsLangMenuOpen(false); }}
+                  className={`w-full text-left px-4 py-3 text-sm hover:bg-white/5 transition flex items-center space-x-3 ${lang === 'en' ? 'text-[#C5A065] bg-white/5' : 'text-gray-300'}`}
+                >
+                  <img src="https://flagcdn.com/w40/us.png" alt="USA" className="w-5 h-3.5 rounded-sm object-cover" />
+                  <span>English</span>
+                </button>
+              </div>
+            )}
+          </div>
           <div className="text-white text-sm hidden md:block">
             {user?.email}
           </div>
@@ -93,12 +111,22 @@ export default function Navbar() {
           <div className="h-px w-16 bg-white/20 my-4"></div>
           
           <div className="text-gray-400 text-sm">{user?.email}</div>
-          <button
-            onClick={toggleLang}
-            className="text-white text-sm border border-white/20 rounded-full px-6 py-2 hover:bg-white/10 transition"
-          >
-            {t('lang_label')}
-          </button>
+          <div className="flex space-x-4">
+            <button
+              onClick={() => setLang('pt')}
+              className={`flex items-center space-x-2 px-4 py-2 rounded-full border transition ${lang === 'pt' ? 'border-[#C5A065] bg-[#C5A065]/10 text-[#C5A065]' : 'border-white/20 text-gray-400'}`}
+            >
+              <img src="https://flagcdn.com/w40/br.png" alt="Brasil" className="w-6 h-4 rounded-sm object-cover" />
+              <span>PT</span>
+            </button>
+            <button
+              onClick={() => setLang('en')}
+              className={`flex items-center space-x-2 px-4 py-2 rounded-full border transition ${lang === 'en' ? 'border-[#C5A065] bg-[#C5A065]/10 text-[#C5A065]' : 'border-white/20 text-gray-400'}`}
+            >
+              <img src="https://flagcdn.com/w40/us.png" alt="USA" className="w-6 h-4 rounded-sm object-cover" />
+              <span>EN</span>
+            </button>
+          </div>
           <button
             onClick={() => {
               setIsMobileMenuOpen(false);
