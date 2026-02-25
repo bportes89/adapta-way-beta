@@ -12,6 +12,7 @@ export default function AssetsPage() {
   const { user, loading: authLoading } = useAuth();
   const [assets, setAssets] = useState([]);
   const [myAssets, setMyAssets] = useState([]);
+  const [selectedAsset, setSelectedAsset] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
 
@@ -66,8 +67,12 @@ export default function AssetsPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {myAssets.map((item: any) => (
-                <div key={item.id} className="bg-[#111] border border-white/5 p-8 rounded-xl hover:bg-[#161616] transition duration-300 shadow-lg shadow-black/50">
-                  <h3 className="font-bold text-xl mb-3 text-white">{item.asset.name}</h3>
+                <div 
+                  key={item.id} 
+                  onClick={() => setSelectedAsset(item)}
+                  className="bg-[#111] border border-white/5 p-8 rounded-xl hover:bg-[#161616] transition duration-300 shadow-lg shadow-black/50 cursor-pointer group"
+                >
+                  <h3 className="font-bold text-xl mb-3 text-white group-hover:text-[#C5A065] transition">{item.asset.name}</h3>
                   <p className="text-gray-400 text-sm mb-6 line-clamp-2 leading-relaxed">{item.asset.description}</p>
                   <div className="flex justify-between items-end border-t border-white/5 pt-4">
                     <div>
@@ -124,6 +129,59 @@ export default function AssetsPage() {
           </div>
         </section>
       </div>
+
+      {/* Asset Details Modal */}
+      {selectedAsset && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200" onClick={() => setSelectedAsset(null)}>
+          <div className="bg-[#111] border border-white/10 rounded-2xl max-w-lg w-full p-8 relative shadow-2xl animate-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
+            <button 
+              onClick={() => setSelectedAsset(null)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
+            >
+              ✕
+            </button>
+            
+            <h2 className="text-3xl font-light text-[#C5A065] mb-2">{selectedAsset.asset.name}</h2>
+            <div className="w-12 h-1 bg-[#C5A065] mb-6"></div>
+            
+            <div className="space-y-8">
+              <div>
+                <h3 className="text-xs uppercase tracking-wider text-gray-500 mb-2 font-bold">Descrição</h3>
+                <p className="text-gray-300 leading-relaxed text-sm">{selectedAsset.asset.description}</p>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-white/5 p-5 rounded-xl border border-white/5">
+                   <h3 className="text-xs uppercase tracking-wider text-gray-500 mb-1 font-bold">Seu Saldo</h3>
+                   <p className="text-3xl text-white font-light">{selectedAsset.amount}</p>
+                   <p className="text-[10px] text-gray-500 mt-1 uppercase tracking-wider">Cotas</p>
+                </div>
+                <div className="bg-white/5 p-5 rounded-xl border border-white/5">
+                   <h3 className="text-xs uppercase tracking-wider text-gray-500 mb-1 font-bold">Valor Unitário</h3>
+                   <p className="text-3xl text-[#C5A065] font-mono">{formatNumber(selectedAsset.asset.referenceValue)}</p>
+                   <p className="text-[10px] text-gray-500 mt-1 uppercase tracking-wider">AdaptaCoins</p>
+                </div>
+              </div>
+
+              <div className="bg-[#C5A065]/5 border border-[#C5A065]/20 p-4 rounded-xl">
+                  <div className="flex justify-between items-center mb-1">
+                      <span className="text-xs uppercase tracking-wider text-[#C5A065] font-bold">Valor Total em Posse</span>
+                      <span className="text-xl text-[#C5A065] font-mono font-bold">{formatNumber(selectedAsset.amount * selectedAsset.asset.referenceValue)} AC</span>
+                  </div>
+              </div>
+
+              <div className="pt-6 border-t border-white/5 flex justify-end">
+                 <button 
+                   onClick={() => setSelectedAsset(null)}
+                   className="bg-white text-black px-6 py-2 rounded-full font-bold text-sm hover:bg-gray-200 transition uppercase tracking-wide"
+                 >
+                   Fechar
+                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
