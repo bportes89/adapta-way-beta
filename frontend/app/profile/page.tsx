@@ -114,11 +114,7 @@ export default function ProfilePage() {
     formData.append('file', file);
 
     try {
-      const response = await api.post(`/users/${user.id}/upload-photo`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const response = await api.post(`/users/${user.id}/upload-photo`, formData);
       setPhotoUrl(response.data.photoUrl);
       updateUser({ photoUrl: response.data.photoUrl });
       setMessage('Foto de perfil atualizada com sucesso!');

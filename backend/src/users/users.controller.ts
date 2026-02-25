@@ -136,7 +136,9 @@ export class UsersController {
       throw new Error('File upload failed');
     }
     const baseUrl = process.env.API_URL || 'http://localhost:3001';
-    const photoUrl = `${baseUrl}/uploads/avatars/${file.filename}`;
+    // Ensure baseUrl doesn't end with slash and file.filename doesn't start with slash to avoid double slashes
+    // But here we construct the URL to be stored in DB
+    const photoUrl = `${baseUrl.replace(/\/$/, '')}/uploads/avatars/${file.filename}`;
     await this.usersService.update(id, { photoUrl });
     return { photoUrl };
   }
