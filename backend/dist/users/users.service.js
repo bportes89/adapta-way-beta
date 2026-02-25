@@ -80,8 +80,31 @@ let UsersService = class UsersService {
         user.wallet = wallet;
         return this.usersRepository.save(user);
     }
-    findAll() {
-        return this.usersRepository.find();
+    async findAll(options, search) {
+        if (!options)
+            return this.usersRepository.find();
+        const page = options.page || 1;
+        const limit = options.limit || 10;
+        const skip = (page - 1) * limit;
+        const where = search ? [
+            { name: (0, typeorm_2.Like)(`%${search}%`) },
+            { email: (0, typeorm_2.Like)(`%${search}%`) }
+        ] : {};
+        const [result, total] = await this.usersRepository.findAndCount({
+            where,
+            relations: ['wallet'],
+            take: limit,
+            skip,
+            order: { createdAt: 'DESC' }
+        });
+        return {
+            data: result,
+            meta: {
+                total,
+                page,
+                last_page: Math.ceil(total / limit),
+            }
+        };
     }
     findOne(id) {
         return this.usersRepository.findOne({
@@ -113,6 +136,9 @@ let UsersService = class UsersService {
     }
     async updateStatus(id, status) {
         return this.usersRepository.update(id, { status });
+    }
+    async updateRole(id, role) {
+        return this.usersRepository.update(id, { role });
     }
 };
 exports.UsersService = UsersService;

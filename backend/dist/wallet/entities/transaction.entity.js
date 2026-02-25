@@ -20,10 +20,12 @@ var TransactionType;
     TransactionType["MINT"] = "MINT";
     TransactionType["BURN"] = "BURN";
     TransactionType["BUY_ASSET"] = "BUY_ASSET";
+    TransactionType["CONVERSION"] = "CONVERSION";
 })(TransactionType || (exports.TransactionType = TransactionType = {}));
 let Transaction = class Transaction {
     id;
     amount;
+    currency;
     type;
     fromWallet;
     toWallet;
@@ -39,6 +41,10 @@ __decorate([
     (0, typeorm_1.Column)('decimal'),
     __metadata("design:type", Number)
 ], Transaction.prototype, "amount", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: 'BRL' }),
+    __metadata("design:type", String)
+], Transaction.prototype, "currency", void 0);
 __decorate([
     (0, typeorm_1.Column)({
         type: 'simple-enum',

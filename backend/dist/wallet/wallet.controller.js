@@ -31,8 +31,11 @@ let WalletController = class WalletController {
     deposit(req, body) {
         return this.walletService.deposit(req.user.userId, body.amount);
     }
+    convert(req, body) {
+        return this.walletService.convert(req.user.userId, body.amount, body.fromCurrency);
+    }
     transfer(req, body) {
-        return this.walletService.transfer(req.user.userId, body.recipient, body.amount);
+        return this.walletService.transfer(req.user.userId, body.recipient, body.amount, body.currency || 'BRL');
     }
     withdraw(req, body) {
         return this.walletService.withdraw(req.user.userId, body.amount);
@@ -51,6 +54,12 @@ let WalletController = class WalletController {
     }
     rejectWithdrawal(id) {
         return this.walletService.rejectWithdrawal(id);
+    }
+    mint(body) {
+        return this.walletService.mint(body.userId, body.amount);
+    }
+    burn(body) {
+        return this.walletService.burn(body.userId, body.amount);
     }
     getHistory(req) {
         return this.walletService.getHistory(req.user.userId);
@@ -81,6 +90,24 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], WalletController.prototype, "deposit", null);
 __decorate([
+    (0, common_1.Post)('convert'),
+    (0, swagger_1.ApiOperation)({ summary: 'Convert between BRL and AdaptaCoin' }),
+    (0, swagger_1.ApiBody)({
+        schema: {
+            type: 'object',
+            properties: {
+                amount: { type: 'number', example: 100 },
+                fromCurrency: { type: 'string', enum: ['BRL', 'ADAPTA'], example: 'BRL' },
+            },
+        },
+    }),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", void 0)
+], WalletController.prototype, "convert", null);
+__decorate([
     (0, common_1.Post)('transfer'),
     (0, swagger_1.ApiOperation)({
         summary: 'Transfer funds to another user (Email or Wallet Address)',
@@ -91,6 +118,7 @@ __decorate([
             properties: {
                 recipient: { type: 'string', example: 'receiver@example.com or 0x...' },
                 amount: { type: 'number', example: 50 },
+                currency: { type: 'string', enum: ['BRL', 'ADAPTA'], example: 'BRL', default: 'BRL' },
             },
         },
     }),
@@ -165,6 +193,44 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], WalletController.prototype, "rejectWithdrawal", null);
+__decorate([
+    (0, common_1.Post)('admin/mint'),
+    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)('admin'),
+    (0, swagger_1.ApiOperation)({ summary: 'Mint AdaptaCoins for a user (Admin only)' }),
+    (0, swagger_1.ApiBody)({
+        schema: {
+            type: 'object',
+            properties: {
+                userId: { type: 'string' },
+                amount: { type: 'number' },
+            },
+        },
+    }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], WalletController.prototype, "mint", null);
+__decorate([
+    (0, common_1.Post)('admin/burn'),
+    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)('admin'),
+    (0, swagger_1.ApiOperation)({ summary: 'Burn AdaptaCoins from a user (Admin only)' }),
+    (0, swagger_1.ApiBody)({
+        schema: {
+            type: 'object',
+            properties: {
+                userId: { type: 'string' },
+                amount: { type: 'number' },
+            },
+        },
+    }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], WalletController.prototype, "burn", null);
 __decorate([
     (0, common_1.Get)('history'),
     (0, swagger_1.ApiOperation)({ summary: 'Get transaction history' }),

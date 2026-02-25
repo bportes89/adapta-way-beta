@@ -16,6 +16,8 @@ class CreateUserDto {
     email;
     password;
     name;
+    socialName;
+    photoUrl;
     role;
 }
 exports.CreateUserDto = CreateUserDto;
@@ -43,6 +45,27 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], CreateUserDto.prototype, "name", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'Johnny',
+        description: 'The social name of the user',
+        required: false,
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateUserDto.prototype, "socialName", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'https://example.com/photo.jpg',
+        description: 'The photo URL of the user',
+        required: false,
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsUrl)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateUserDto.prototype, "photoUrl", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
         example: 'user',

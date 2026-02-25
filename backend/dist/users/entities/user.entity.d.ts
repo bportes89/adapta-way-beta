@@ -4,9 +4,13 @@ export declare class User {
     email: string;
     password: string;
     name: string;
+    socialName: string;
+    photoUrl: string;
     role: string;
     status: string;
     is2faEnabled: boolean;
     twoFactorAuthenticationSecret?: string;
     wallet: Wallet;
+    createdAt: Date;
+    updatedAt: Date;
 }

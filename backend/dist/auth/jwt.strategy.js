@@ -14,13 +14,14 @@ const passport_jwt_1 = require("passport-jwt");
 const passport_1 = require("@nestjs/passport");
 const common_1 = require("@nestjs/common");
 const users_service_1 = require("../users/users.service");
+const config_1 = require("@nestjs/config");
 let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(passport_jwt_1.Strategy) {
     usersService;
-    constructor(usersService) {
+    constructor(usersService, configService) {
         super({
             jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: false,
-            secretOrKey: 'mvp_secret_key',
+            secretOrKey: configService.get('JWT_SECRET') || 'mvp_secret_key',
         });
         this.usersService = usersService;
     }
@@ -29,12 +30,22 @@ let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(pas
         if (!user) {
             throw new common_1.UnauthorizedException();
         }
-        return { userId: user.id, email: user.email, role: user.role };
+        return {
+            userId: user.id,
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+            socialName: user.socialName,
+            photoUrl: user.photoUrl,
+            is2faEnabled: user.is2faEnabled,
+        };
     }
 };
 exports.JwtStrategy = JwtStrategy;
 exports.JwtStrategy = JwtStrategy = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [users_service_1.UsersService])
+    __metadata("design:paramtypes", [users_service_1.UsersService,
+        config_1.ConfigService])
 ], JwtStrategy);
 //# sourceMappingURL=jwt.strategy.js.map

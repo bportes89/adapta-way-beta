@@ -8,7 +8,14 @@ export declare class UsersService {
     private walletRepository;
     constructor(usersRepository: Repository<User>, walletRepository: Repository<Wallet>);
     create(createUserDto: CreateUserDto): Promise<User>;
-    findAll(): Promise<User[]>;
+    findAll(options?: any, search?: string): Promise<User[] | {
+        data: User[];
+        meta: {
+            total: number;
+            page: any;
+            last_page: number;
+        };
+    }>;
     findOne(id: string): Promise<User | null>;
     findByEmail(email: string): Promise<User | null>;
     update(id: string, updateUserDto: UpdateUserDto): Promise<import("typeorm").UpdateResult>;
@@ -16,4 +23,5 @@ export declare class UsersService {
     setTwoFactorAuthenticationSecret(secret: string, userId: string): Promise<import("typeorm").UpdateResult>;
     turnOnTwoFactorAuthentication(userId: string): Promise<import("typeorm").UpdateResult>;
     updateStatus(id: string, status: string): Promise<import("typeorm").UpdateResult>;
+    updateRole(id: string, role: string): Promise<import("typeorm").UpdateResult>;
 }

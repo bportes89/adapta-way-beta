@@ -4,6 +4,7 @@ export declare class Wallet {
     id: string;
     address: string;
     balance: number;
+    adaptaCoinBalance: number;
     user: User;
     transactionsSent: Transaction[];
     transactionsReceived: Transaction[];

@@ -37,7 +37,16 @@ let AssetsService = class AssetsService {
             ...createAssetDto,
             availableSupply: createAssetDto.totalSupply,
         });
-        return this.assetRepository.save(asset);
+        const savedAsset = await this.assetRepository.save(asset);
+        await this.blockchainService.createBlock({
+            type: 'ASSET_CREATION',
+            assetId: savedAsset.id,
+            name: savedAsset.name,
+            totalSupply: savedAsset.totalSupply,
+            referenceValue: savedAsset.referenceValue,
+            timestamp: new Date().toISOString(),
+        });
+        return savedAsset;
     }
     findAll() {
         return this.assetRepository.find();
@@ -71,10 +80,10 @@ let AssetsService = class AssetsService {
             });
             if (!wallet)
                 throw new common_1.NotFoundException('Wallet not found');
-            if (wallet.balance < totalCost) {
-                throw new common_1.BadRequestException('Insufficient balance to buy assets');
+            if (Number(wallet.adaptaCoinBalance) < totalCost) {
+                throw new common_1.BadRequestException('Insufficient AdaptaCoin balance to buy assets');
             }
-            wallet.balance = Number(wallet.balance) - Number(totalCost);
+            wallet.adaptaCoinBalance = Number(wallet.adaptaCoinBalance) - Number(totalCost);
             await queryRunner.manager.save(wallet);
             asset.availableSupply = Number(asset.availableSupply) - Number(amount);
             await queryRunner.manager.save(asset);
@@ -94,17 +103,19 @@ let AssetsService = class AssetsService {
             }
             const transaction = new transaction_entity_1.Transaction();
             transaction.amount = totalCost;
+            transaction.currency = 'ADAPTA';
             transaction.type = transaction_entity_1.TransactionType.BUY_ASSET;
             transaction.fromWallet = wallet;
             transaction.timestamp = new Date();
             await queryRunner.manager.save(transaction);
             await queryRunner.commitTransaction();
-            this.blockchainService.createBlock({
+            await this.blockchainService.createBlock({
                 type: 'BUY_ASSET',
                 walletId: wallet.id,
                 assetId: asset.id,
                 amount: amount,
                 totalCost: totalCost,
+                currency: 'ADAPTA',
                 timestamp: new Date().toISOString(),
             });
             return { message: 'Asset purchased successfully', assetToken };

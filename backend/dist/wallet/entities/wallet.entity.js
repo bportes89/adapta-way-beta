@@ -17,6 +17,7 @@ let Wallet = class Wallet {
     id;
     address;
     balance;
+    adaptaCoinBalance;
     user;
     transactionsSent;
     transactionsReceived;
@@ -34,6 +35,10 @@ __decorate([
     (0, typeorm_1.Column)('decimal', { default: 0 }),
     __metadata("design:type", Number)
 ], Wallet.prototype, "balance", void 0);
+__decorate([
+    (0, typeorm_1.Column)('decimal', { default: 0 }),
+    __metadata("design:type", Number)
+], Wallet.prototype, "adaptaCoinBalance", void 0);
 __decorate([
     (0, typeorm_1.OneToOne)(() => user_entity_1.User, (user) => user.wallet),
     __metadata("design:type", user_entity_1.User)

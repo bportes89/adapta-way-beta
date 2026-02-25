@@ -84,8 +84,73 @@ let WalletService = class WalletService {
         }
         return {
             balance: user.wallet.balance,
+            adaptaCoinBalance: user.wallet.adaptaCoinBalance,
             address: user.wallet.address,
         };
+    }
+    async convert(userId, amount, fromCurrency) {
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+        try {
+            const user = await this.userRepository.findOne({
+                where: { id: userId },
+                relations: ['wallet'],
+            });
+            if (!user || !user.wallet) {
+                throw new common_1.NotFoundException('Wallet not found');
+            }
+            if (amount <= 0) {
+                throw new common_1.BadRequestException('Amount must be positive');
+            }
+            const feeRate = 0.01;
+            const fee = Number(amount) * feeRate;
+            const netAmount = Number(amount) - fee;
+            if (fromCurrency === 'BRL') {
+                if (Number(user.wallet.balance) < amount) {
+                    throw new common_1.BadRequestException('Insufficient BRL balance');
+                }
+                user.wallet.balance = Number(user.wallet.balance) - Number(amount);
+                user.wallet.adaptaCoinBalance = Number(user.wallet.adaptaCoinBalance) + netAmount;
+            }
+            else {
+                if (Number(user.wallet.adaptaCoinBalance) < amount) {
+                    throw new common_1.BadRequestException('Insufficient AdaptaCoin balance');
+                }
+                user.wallet.adaptaCoinBalance = Number(user.wallet.adaptaCoinBalance) - Number(amount);
+                user.wallet.balance = Number(user.wallet.balance) + netAmount;
+            }
+            await queryRunner.manager.save(user.wallet);
+            const transaction = new transaction_entity_1.Transaction();
+            transaction.amount = amount;
+            transaction.type = transaction_entity_1.TransactionType.CONVERSION;
+            transaction.fromWallet = user.wallet;
+            transaction.toWallet = user.wallet;
+            transaction.currency = fromCurrency;
+            transaction.timestamp = new Date();
+            await queryRunner.manager.save(transaction);
+            await queryRunner.commitTransaction();
+            this.blockchainService.createBlock({
+                type: 'CONVERSION',
+                walletId: user.wallet.id,
+                amount: amount,
+                fromCurrency,
+                toCurrency: fromCurrency === 'BRL' ? 'ADAPTA' : 'BRL',
+                timestamp: new Date().toISOString(),
+            });
+            return {
+                message: 'Conversion successful',
+                newBalance: user.wallet.balance,
+                newAdaptaCoinBalance: user.wallet.adaptaCoinBalance,
+            };
+        }
+        catch (err) {
+            await queryRunner.rollbackTransaction();
+            throw err;
+        }
+        finally {
+            await queryRunner.release();
+        }
     }
     async deposit(userId, amount) {
         const queryRunner = this.dataSource.createQueryRunner();
@@ -124,7 +189,7 @@ let WalletService = class WalletService {
             await queryRunner.release();
         }
     }
-    async transfer(fromUserId, recipient, amount) {
+    async transfer(fromUserId, recipient, amount, currency = 'BRL') {
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
         await queryRunner.startTransaction();
@@ -153,12 +218,20 @@ let WalletService = class WalletService {
                 throw new common_1.NotFoundException('Sender wallet not found');
             if (!toUser || !toUser.wallet)
                 throw new common_1.NotFoundException('Recipient not found');
-            if (fromUser.wallet.balance < amount) {
-                throw new common_1.BadRequestException('Insufficient balance');
+            if (currency === 'BRL') {
+                if (Number(fromUser.wallet.balance) < amount) {
+                    throw new common_1.BadRequestException('Insufficient BRL balance');
+                }
+                fromUser.wallet.balance = Number(fromUser.wallet.balance) - Number(amount);
+                toUser.wallet.balance = Number(toUser.wallet.balance) + Number(amount);
             }
-            fromUser.wallet.balance =
-                Number(fromUser.wallet.balance) - Number(amount);
-            toUser.wallet.balance = Number(toUser.wallet.balance) + Number(amount);
+            else {
+                if (Number(fromUser.wallet.adaptaCoinBalance) < amount) {
+                    throw new common_1.BadRequestException('Insufficient AdaptaCoin balance');
+                }
+                fromUser.wallet.adaptaCoinBalance = Number(fromUser.wallet.adaptaCoinBalance) - Number(amount);
+                toUser.wallet.adaptaCoinBalance = Number(toUser.wallet.adaptaCoinBalance) + Number(amount);
+            }
             await queryRunner.manager.save(fromUser.wallet);
             await queryRunner.manager.save(toUser.wallet);
             const transaction = new transaction_entity_1.Transaction();
@@ -166,6 +239,7 @@ let WalletService = class WalletService {
             transaction.type = transaction_entity_1.TransactionType.TRANSFER;
             transaction.fromWallet = fromUser.wallet;
             transaction.toWallet = toUser.wallet;
+            transaction.currency = currency;
             transaction.timestamp = new Date();
             await queryRunner.manager.save(transaction);
             await queryRunner.commitTransaction();
@@ -174,6 +248,7 @@ let WalletService = class WalletService {
                 fromWalletId: fromUser.wallet.id,
                 toWalletId: toUser.wallet.id,
                 amount: amount,
+                currency: currency,
                 timestamp: new Date().toISOString(),
             });
             return { message: 'Transfer successful' };
@@ -387,6 +462,87 @@ let WalletService = class WalletService {
             relations: ['fromWallet', 'toWallet'],
         });
         return transactions;
+    }
+    async mint(userId, amount) {
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+        try {
+            const user = await this.userRepository.findOne({
+                where: { id: userId },
+                relations: ['wallet'],
+            });
+            if (!user || !user.wallet) {
+                throw new common_1.NotFoundException('Wallet not found');
+            }
+            user.wallet.adaptaCoinBalance = Number(user.wallet.adaptaCoinBalance) + Number(amount);
+            await queryRunner.manager.save(user.wallet);
+            const transaction = new transaction_entity_1.Transaction();
+            transaction.amount = amount;
+            transaction.type = transaction_entity_1.TransactionType.MINT;
+            transaction.toWallet = user.wallet;
+            transaction.currency = 'ADAPTA';
+            transaction.timestamp = new Date();
+            await queryRunner.manager.save(transaction);
+            await queryRunner.commitTransaction();
+            this.blockchainService.createBlock({
+                type: 'MINT',
+                walletId: user.wallet.id,
+                amount: amount,
+                currency: 'ADAPTA',
+                timestamp: new Date().toISOString(),
+            });
+            return { newAdaptaCoinBalance: user.wallet.adaptaCoinBalance };
+        }
+        catch (err) {
+            await queryRunner.rollbackTransaction();
+            throw err;
+        }
+        finally {
+            await queryRunner.release();
+        }
+    }
+    async burn(userId, amount) {
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+        try {
+            const user = await this.userRepository.findOne({
+                where: { id: userId },
+                relations: ['wallet'],
+            });
+            if (!user || !user.wallet) {
+                throw new common_1.NotFoundException('Wallet not found');
+            }
+            if (Number(user.wallet.adaptaCoinBalance) < amount) {
+                throw new common_1.BadRequestException('Insufficient AdaptaCoin balance');
+            }
+            user.wallet.adaptaCoinBalance = Number(user.wallet.adaptaCoinBalance) - Number(amount);
+            await queryRunner.manager.save(user.wallet);
+            const transaction = new transaction_entity_1.Transaction();
+            transaction.amount = amount;
+            transaction.type = transaction_entity_1.TransactionType.BURN;
+            transaction.fromWallet = user.wallet;
+            transaction.currency = 'ADAPTA';
+            transaction.timestamp = new Date();
+            await queryRunner.manager.save(transaction);
+            await queryRunner.commitTransaction();
+            this.blockchainService.createBlock({
+                type: 'BURN',
+                walletId: user.wallet.id,
+                amount: amount,
+                currency: 'ADAPTA',
+                timestamp: new Date().toISOString(),
+            });
+            return { newAdaptaCoinBalance: user.wallet.adaptaCoinBalance };
+        }
+        catch (err) {
+            await queryRunner.rollbackTransaction();
+            throw err;
+        }
+        finally {
+            await queryRunner.release();
+        }
     }
 };
 exports.WalletService = WalletService;
