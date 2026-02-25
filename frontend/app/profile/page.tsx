@@ -224,17 +224,17 @@ export default function ProfilePage() {
               {show2faSetup && !is2faEnabled && (
                 <div className="mt-6 p-6 bg-[#000] rounded-xl border border-[#C5A065]/30 animate-fade-in">
                   <h4 className="font-bold text-[#C5A065] mb-4">Configurar 2FA</h4>
-                  <div className="flex flex-col lg:flex-row gap-8 items-start">
-                    <div className="bg-white p-4 rounded-lg shrink-0 flex items-center justify-center mx-auto lg:mx-0">
+                  <div className="flex flex-col gap-8 items-center text-center">
+                    <div className="bg-white p-4 rounded-lg shrink-0 flex items-center justify-center">
                       {qrCodeUrl && <img src={qrCodeUrl} alt="QR Code 2FA" className="w-[150px] h-[150px] object-contain" />}
                     </div>
                     <div className="flex-1 space-y-4 w-full">
                       <p className="text-sm text-gray-300">
                         1. Baixe um aplicativo autenticador (Google Authenticator, Authy, etc).<br/>
-                        2. Escaneie o QR Code ao lado.<br/>
+                        2. Escaneie o QR Code acima.<br/>
                         3. Digite o código de 6 dígitos gerado pelo aplicativo abaixo.
                       </p>
-                      <div className="flex flex-col sm:flex-row gap-3">
+                      <div className="flex flex-col sm:flex-row gap-3 justify-center">
                         <input 
                           type="text" 
                           value={twoFactorCode}
