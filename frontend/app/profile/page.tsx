@@ -225,8 +225,8 @@ export default function ProfilePage() {
                 <div className="mt-6 p-6 bg-[#000] rounded-xl border border-[#C5A065]/30 animate-fade-in">
                   <h4 className="font-bold text-[#C5A065] mb-4">Configurar 2FA</h4>
                   <div className="flex flex-col md:flex-row gap-8 items-center">
-                    <div className="bg-white p-4 rounded-lg">
-                      {qrCodeUrl && <img src={qrCodeUrl} alt="QR Code 2FA" className="w-[150px] h-[150px]" />}
+                    <div className="bg-white p-4 rounded-lg shrink-0 flex items-center justify-center">
+                      {qrCodeUrl && <img src={qrCodeUrl} alt="QR Code 2FA" className="w-[150px] h-[150px] object-contain" />}
                     </div>
                     <div className="flex-1 space-y-4">
                       <p className="text-sm text-gray-300">
