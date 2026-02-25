@@ -12,8 +12,10 @@ import {
   ParseIntPipe,
   UseInterceptors,
   UploadedFile,
+  Req,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Request } from 'express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { UsersService } from './users.service';
@@ -131,11 +133,15 @@ export class UsersController {
       fileSize: 5 * 1024 * 1024, // 5MB
     },
   }))
-  async uploadPhoto(@Param('id') id: string, @UploadedFile() file: Express.Multer.File) {
+  async uploadPhoto(@Param('id') id: string, @UploadedFile() file: Express.Multer.File, @Req() req: Request) {
     if (!file) {
       throw new Error('File upload failed');
     }
-    const baseUrl = process.env.API_URL || 'http://localhost:3001';
+    
+    const protocol = req.headers['x-forwarded-proto'] ? req.headers['x-forwarded-proto'].toString() : req.protocol;
+    const host = req.get('host');
+    const baseUrl = process.env.API_URL || `${protocol}://${host}`;
+    
     // Ensure baseUrl doesn't end with slash and file.filename doesn't start with slash to avoid double slashes
     // But here we construct the URL to be stored in DB
     const photoUrl = `${baseUrl.replace(/\/$/, '')}/uploads/avatars/${file.filename}`;
