@@ -108,14 +108,33 @@ export class UsersController {
   @ApiOperation({ summary: 'Upload user profile photo' })
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
-      destination: './uploads/avatars',
+      destination: (req, file, cb) => {
+        const uploadPath = './uploads/avatars';
+        const fs = require('fs');
+        if (!fs.existsSync(uploadPath)) {
+          fs.mkdirSync(uploadPath, { recursive: true });
+        }
+        cb(null, uploadPath);
+      },
       filename: (req, file, cb) => {
         const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('');
         return cb(null, `${randomName}${extname(file.originalname)}`);
       },
     }),
+    fileFilter: (req, file, cb) => {
+      if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+        return cb(new Error('Only image files are allowed!'), false);
+      }
+      cb(null, true);
+    },
+    limits: {
+      fileSize: 5 * 1024 * 1024, // 5MB
+    },
   }))
   async uploadPhoto(@Param('id') id: string, @UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      throw new Error('File upload failed');
+    }
     const baseUrl = process.env.API_URL || 'http://localhost:3001';
     const photoUrl = `${baseUrl}/uploads/avatars/${file.filename}`;
     await this.usersService.update(id, { photoUrl });

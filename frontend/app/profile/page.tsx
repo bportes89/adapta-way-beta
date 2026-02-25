@@ -124,7 +124,7 @@ export default function ProfilePage() {
       setMessage('Foto de perfil atualizada com sucesso!');
     } catch (err: any) {
       console.error(err);
-      setError('Erro ao fazer upload da foto.');
+      setError(err.response?.data?.message || 'Erro ao fazer upload da foto.');
     } finally {
       setUploadingPhoto(false);
     }
