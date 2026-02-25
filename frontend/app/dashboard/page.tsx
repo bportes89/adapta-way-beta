@@ -4,7 +4,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import api from '../../lib/api';
 import Navbar from '../../components/Navbar';
-import { formatNumber } from '../../lib/utils';
+import { formatNumber, formatCurrencyInput, formatNumberInput, parseCurrencyToNumber } from '../../lib/utils';
 import { t, useLang } from '../../lib/i18n';
 import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/navigation';
@@ -97,21 +97,22 @@ export default function DashboardPage() {
 
   const handleDeposit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!depositAmount || isNaN(Number(depositAmount)) || Number(depositAmount) <= 0) {
+    const amount = parseCurrencyToNumber(depositAmount);
+    if (!amount || isNaN(amount) || amount <= 0) {
       alert(t('valid_amount'));
       return;
     }
 
     // Generate Fake PIX Code
     const randomHash = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-    setPixCode(`00020126580014BR.GOV.BCB.PIX0136${randomHash}520400005303986540${Number(depositAmount).toFixed(2).replace('.', '')}5802BR5913ADAPTA WAY6008BRASILIA62070503***6304${randomHash.substring(0, 4).toUpperCase()}`);
+    setPixCode(`00020126580014BR.GOV.BCB.PIX0136${randomHash}520400005303986540${amount.toFixed(2).replace('.', '')}5802BR5913ADAPTA WAY6008BRASILIA62070503***6304${randomHash.substring(0, 4).toUpperCase()}`);
     setDepositStep('pix');
   };
 
   const confirmDepositPayment = async () => {
     setIsDepositing(true);
     try {
-      await api.post('/wallet/deposit', { amount: Number(depositAmount) });
+      await api.post('/wallet/deposit', { amount: parseCurrencyToNumber(depositAmount) });
       alert(t('deposit_success'));
       setDepositAmount('');
       setDepositStep('amount');
@@ -127,7 +128,8 @@ export default function DashboardPage() {
 
   const handleTransfer = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!transferAmount || isNaN(Number(transferAmount)) || Number(transferAmount) <= 0) {
+    const amount = parseCurrencyToNumber(transferAmount);
+    if (!amount || isNaN(amount) || amount <= 0) {
       alert(t('valid_amount'));
       return;
     }
@@ -140,7 +142,7 @@ export default function DashboardPage() {
     try {
       await api.post('/wallet/transfer', { 
           recipient: transferRecipient,
-          amount: Number(transferAmount),
+          amount,
           currency: transferCurrency
       });
       alert(t('transfer_success'));
@@ -159,7 +161,8 @@ export default function DashboardPage() {
 
   const handleConvert = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!convertAmount || isNaN(Number(convertAmount)) || Number(convertAmount) <= 0) {
+    const amount = parseCurrencyToNumber(convertAmount);
+    if (!amount || isNaN(amount) || amount <= 0) {
       alert(t('valid_amount'));
       return;
     }
@@ -167,7 +170,7 @@ export default function DashboardPage() {
     setIsConverting(true);
     try {
       await api.post('/wallet/convert', {
-        amount: Number(convertAmount),
+        amount,
         fromCurrency: convertFrom
       });
       alert('Conversão realizada com sucesso!');
@@ -185,7 +188,8 @@ export default function DashboardPage() {
 
   const handleWithdraw = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!withdrawAmount || isNaN(Number(withdrawAmount)) || Number(withdrawAmount) <= 0) {
+    const amount = parseCurrencyToNumber(withdrawAmount);
+    if (!amount || isNaN(amount) || amount <= 0) {
       alert(t('valid_amount'));
       return;
     }
@@ -197,7 +201,7 @@ export default function DashboardPage() {
     setIsWithdrawing(true);
     try {
       await api.post('/wallet/withdraw-request', { 
-          amount: Number(withdrawAmount),
+          amount,
           pixKey: withdrawPixKey
       });
       alert(t('withdraw_request_success'));
@@ -419,12 +423,10 @@ export default function DashboardPage() {
                   <div>
                     <label className="block text-xs font-bold text-[#C5A065] uppercase tracking-wider mb-2">{t('amount_brl_label')}</label>
                     <input 
-                      type="number" 
-                      step="0.01"
-                      min="0.01"
+                      type="text" 
                       required
                       value={depositAmount}
-                      onChange={(e) => setDepositAmount(e.target.value)}
+                      onChange={(e) => setDepositAmount(formatCurrencyInput(e.target.value))}
                       className="w-full bg-[#000] border border-white/10 rounded-lg p-4 text-white focus:outline-none focus:border-[#C5A065] transition text-lg"
                       placeholder={t('amount_placeholder_brl')}
                     />
@@ -540,12 +542,13 @@ export default function DashboardPage() {
               <div>
                 <label className="block text-xs font-bold text-[#C5A065] uppercase tracking-wider mb-2">{t('amount_ac_label')}</label>
                 <input 
-                  type="number" 
-                  step="0.01"
-                  min="0.01"
+                  type="text" 
                   required
                   value={transferAmount}
-                  onChange={(e) => setTransferAmount(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setTransferAmount(transferCurrency === 'BRL' ? formatCurrencyInput(value) : formatNumberInput(value));
+                  }}
                   className="w-full bg-[#000] border border-white/10 rounded-lg p-4 text-white focus:outline-none focus:border-[#C5A065] transition text-lg"
                   placeholder={t('amount_placeholder_ac')}
                 />
@@ -614,12 +617,13 @@ export default function DashboardPage() {
               <div>
                 <label className="block text-xs font-bold text-[#C5A065] uppercase tracking-wider mb-2">{t('amount_label')}</label>
                 <input 
-                  type="number" 
-                  step="0.01"
-                  min="0.01"
+                  type="text" 
                   required
                   value={convertAmount}
-                  onChange={(e) => setConvertAmount(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setConvertAmount(convertFrom === 'BRL' ? formatCurrencyInput(value) : formatNumberInput(value));
+                  }}
                   className="w-full bg-[#000] border border-white/10 rounded-lg p-4 text-white focus:outline-none focus:border-[#C5A065] transition text-lg"
                   placeholder="0.00"
                 />
@@ -659,12 +663,10 @@ export default function DashboardPage() {
               <div>
                 <label className="block text-xs font-bold text-[#C5A065] uppercase tracking-wider mb-2">{t('amount_label')} (AC)</label>
                 <input 
-                  type="number" 
-                  step="0.01"
-                  min="0.01"
+                  type="text" 
                   required
                   value={withdrawAmount}
-                  onChange={(e) => setWithdrawAmount(e.target.value)}
+                  onChange={(e) => setWithdrawAmount(formatNumberInput(e.target.value))}
                   className="w-full bg-[#000] border border-white/10 rounded-lg p-4 text-white focus:outline-none focus:border-[#C5A065] transition text-lg"
                   placeholder={t('amount_placeholder_ac')}
                 />
