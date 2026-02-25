@@ -628,6 +628,29 @@ export default function DashboardPage() {
                   placeholder="0.00"
                 />
               </div>
+
+              {/* Fee Calculation Display */}
+              {convertAmount && parseCurrencyToNumber(convertAmount) > 0 && (
+                  <div className="bg-[#1a1a1a] p-4 rounded-lg border border-white/5 space-y-3">
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-gray-400">Taxa de Conversão (1%)</span>
+                      <span className="text-white font-mono">
+                        {convertFrom === 'BRL' ? 'R$ ' : ''}
+                        {formatNumber(parseCurrencyToNumber(convertAmount) * 0.01)}
+                        {convertFrom === 'ADAPTA' ? ' ADP' : ''}
+                      </span>
+                    </div>
+                    <div className="h-px bg-white/10 w-full"></div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-[#C5A065] font-bold text-sm">Valor a Receber</span>
+                      <span className="text-[#C5A065] font-mono font-bold text-lg">
+                        {convertFrom === 'ADAPTA' ? 'R$ ' : ''}
+                        {formatNumber(parseCurrencyToNumber(convertAmount) * 0.99)}
+                        {convertFrom === 'BRL' ? ' ADP' : ''}
+                      </span>
+                    </div>
+                  </div>
+              )}
               
               <button 
                 type="submit" 

@@ -71,18 +71,22 @@ export class WalletService {
         throw new BadRequestException('Amount must be positive');
       }
 
+      const feeRate = 0.01; // 1% fee
+      const fee = Number(amount) * feeRate;
+      const netAmount = Number(amount) - fee;
+
       if (fromCurrency === 'BRL') {
         if (Number(user.wallet.balance) < amount) {
           throw new BadRequestException('Insufficient BRL balance');
         }
         user.wallet.balance = Number(user.wallet.balance) - Number(amount);
-        user.wallet.adaptaCoinBalance = Number(user.wallet.adaptaCoinBalance) + Number(amount);
+        user.wallet.adaptaCoinBalance = Number(user.wallet.adaptaCoinBalance) + netAmount;
       } else {
         if (Number(user.wallet.adaptaCoinBalance) < amount) {
           throw new BadRequestException('Insufficient AdaptaCoin balance');
         }
         user.wallet.adaptaCoinBalance = Number(user.wallet.adaptaCoinBalance) - Number(amount);
-        user.wallet.balance = Number(user.wallet.balance) + Number(amount);
+        user.wallet.balance = Number(user.wallet.balance) + netAmount;
       }
 
       await queryRunner.manager.save(user.wallet);
